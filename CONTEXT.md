@@ -76,7 +76,7 @@ Observação de carga: o papel B concentra o diferencial técnico (algoritmo e m
 | 2026-10-11 | README sem emojis, texto específico, sem conteúdo de planejamento interno | DECIDIDO |
 | 2026-10-11 | Contexto de planejamento separado da documentação técnica | DECIDIDO |
 
-Itens do README que ainda são PROPOSTA e precisam de validação do grupo: formato JSON do simulador, passo de simulação de 15 minutos, regras de despacho do motor, regras de preço e casamento do marketplace, stack e estrutura de pastas do repositório, modelo GW7K-HCA como carregador simulado.
+Itens do README que ainda são PROPOSTA e precisam de validação do grupo: formato JSON do simulador, passo de simulação de 15 minutos, regras de despacho do motor, regras de preço e casamento do marketplace, stack e estrutura de pastas do repositório, modelo GW7K-HCA como carregador simulado, ciclo de execução em passos com comando de retorno ao simulador (resposta do POST /readings), formato do comando, lista de endpoints da API e modos de execução (lote e tempo acelerado).
 
 ## 6. Como o projeto foi escolhido
 
@@ -130,9 +130,11 @@ Regras de trabalho: nenhum número entra na seção de resultados sem ter sido g
 10. Existência de credencial para a SEMS Open API.
 11. Pesquisa em fonte oficial sobre a regulação de venda de energia entre particulares no Brasil, para refinar a seção 11 do README.
 12. Nome completo do Victor para o arquivo .txt e para o README.
+13. Validação entre os papéis A e B do formato do comando de retorno ao simulador e da lista de endpoints da API (README, seções 3.4 a 3.6 e 4.2).
 
 ## Histórico de alterações
 
 | Data | Alteração |
 |---|---|
 | 2026-10-11 | Criação a partir do README original, separando contexto e documentação técnica |
+| 2026-10-11 | README: adicionados ciclo de execução, modos de execução, API do backend e comando de retorno ao simulador |

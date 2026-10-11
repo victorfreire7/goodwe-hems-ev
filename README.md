@@ -93,6 +93,7 @@ Motor de decisão (Python): previsão + despacho
 ```
 goodwe-hems-ev/
   README.md
+  CONTEXT.md       contexto do projeto: enunciado, decisões, plano e pontos em aberto
   docs/            diagramas de arquitetura e capturas de tela do sistema
   simulator/       simulador de casa, inversor, bateria e carregador
   adapter/         interface única simulado/goodwe-local
@@ -102,6 +103,51 @@ goodwe-hems-ev/
   dashboard/       interface web
   docker-compose.yml
 ```
+
+### 3.4 Ciclo de execução
+
+O backend não gera dados de simulação. Os dados são gerados pelo simulador. O backend recebe as leituras, armazena, aciona o motor de decisão e o marketplace e serve os dados ao dashboard e à ARIA.
+
+O sistema avança em passos de 15 minutos simulados (96 passos por dia simulado). Em cada passo:
+
+1. O simulador calcula as leituras de todas as casas para o mesmo instante (geração solar, carga, SOC da bateria e SOC do carro) e as envia à API com `POST /readings`.
+2. O backend grava o estado atual de cada casa no Redis e a leitura no MySQL.
+3. O backend chama o motor de decisão, que prevê geração e consumo e aplica as regras da seção 5.1 a cada casa.
+4. O backend executa o marketplace (seção 6) com as ofertas e ordens geradas pelas casas no passo.
+5. A resposta de `POST /readings` devolve ao simulador um comando por casa (seção 4.2).
+6. O simulador aplica os comandos, atualiza o SOC da bateria e do carro e inicia o passo seguinte.
+
+```
+Simulador --(leituras)--> API --> Motor de decisão --> Marketplace
+    ^                                                       |
+    |_____________(comandos na resposta do POST)____________|
+```
+
+O simulador só avança para o passo seguinte depois de receber os comandos do passo atual. Dessa forma, a decisão do motor altera o estado simulado.
+
+### 3.5 Modos de execução
+
+| Modo | Intervalo entre passos | Uso |
+|---|---|---|
+| Lote | Nenhum; limitado pelo tempo de processamento | Gerar os números do comparativo sem e com otimização (seção 10) |
+| Tempo acelerado | Configurável no simulador; valor inicial de 1 segundo por passo, o que equivale a 96 segundos por dia simulado | Dashboard ao vivo e gravação do vídeo de demonstração |
+
+### 3.6 API do backend
+
+A API usa HTTP com corpo em JSON.
+
+| Método | Rota | Quem chama | Descrição |
+|---|---|---|---|
+| POST | `/readings` | Simulador | Recebe a lista de leituras de todas as casas de um passo (objetos no formato da seção 4.1, com o mesmo `timestamp`) e responde com a lista de comandos (seção 4.2) |
+| GET | `/houses/:id/state` | Dashboard, ARIA | Último estado da casa, lido do Redis |
+| GET | `/houses/:id/history` | Dashboard | Leituras da casa em um período, lidas do MySQL (parâmetros `from` e `to`) |
+| GET | `/houses/:id/decision` | Dashboard, ARIA | Última decisão do motor para a casa e o motivo |
+| PUT | `/houses/:id/ev` | Dashboard, ARIA | Define o SOC alvo e a hora de saída do carro |
+| GET | `/comparison` | Dashboard | Métricas dos cenários sem e com otimização (seção 5.4) |
+| GET | `/market/offers` | Dashboard | Ofertas abertas no marketplace |
+| GET | `/market/orders` | Dashboard | Ordens de compra abertas no marketplace |
+| GET | `/market/trades` | Dashboard | Negociações realizadas |
+| GET | `/summary/today` | ARIA, dashboard | Resumo do dia simulado em curso: economia em R$, energia importada da rede em kWh e CO2 evitado em kg |
 
 ## 4. Simulador
 
@@ -138,6 +184,28 @@ Cada leitura é um objeto JSON:
 ```
 
 Convenções: potências em kW; `battery.power_kw` positivo indica descarga e negativo indica carga; `grid_power_kw` positivo indica importação e negativo indica exportação. Os nomes dos campos seguem, sempre que possível, os sensores expostos pela biblioteca `goodwe`, para que a troca do simulador por um inversor real não exija reescrever o restante do sistema.
+
+### 4.2 Comando enviado ao simulador
+
+Para cada casa, a resposta de `POST /readings` traz um comando:
+
+```json
+{
+  "house_id": "casa-01",
+  "timestamp": "2026-10-11T10:00:00-03:00",
+  "ev_charge_power_kw": 1.8,
+  "battery_power_kw": -1.5,
+  "market": { "sold_kwh": 0.0, "bought_kwh": 0.0 },
+  "reason": "excedente solar direcionado ao carro e à bateria"
+}
+```
+
+- `ev_charge_power_kw`: potência ordenada ao carregador, em kW.
+- `battery_power_kw`: potência ordenada à bateria, com a mesma convenção da seção 4.1 (positivo descarrega, negativo carrega).
+- `market.sold_kwh` e `market.bought_kwh`: energia vendida e comprada no marketplace no passo, em kWh (potência em kW multiplicada por 0,25 h).
+- `reason`: texto curto com a regra aplicada. É exibido no dashboard e usado pela ARIA para explicar a decisão.
+
+A potência trocada com a rede não é comandada: ela resulta do balanço de energia da casa. No exemplo, 4,2 kW de geração menos 0,9 kW de carga da casa deixam 3,3 kW, que são consumidos pelo carro (1,8 kW) e pela bateria (1,5 kW), e a troca com a rede é 0 kW. O comando de um passo vale para o passo seguinte.
 
 ## 5. Motor de decisão
 
@@ -215,7 +283,7 @@ O adaptador expõe uma interface única com duas implementações: `simulado` e 
 
 ### 8.2 Assistente ARIA
 
-A ARIA (Assistente de Recarga Inteligente e Autônoma) responde a perguntas como "quanto economizei hoje?" e aceita comandos como "deixe o carro pronto às 7h", consultando o backend por API HTTP. O contrato dessa API é registrado nesta seção.
+A ARIA (Assistente de Recarga Inteligente e Autônoma) responde a perguntas como "quanto economizei hoje?" e aceita comandos como "deixe o carro pronto às 7h", consultando o backend por API HTTP. Ela usa os endpoints `GET /summary/today`, `GET /houses/:id/state`, `GET /houses/:id/decision` e `PUT /houses/:id/ev`, descritos na seção 3.6.
 
 ## 9. Alinhamento à disciplina
 
