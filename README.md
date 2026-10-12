@@ -4,7 +4,7 @@ Gerenciador inteligente de energia residencial com carregamento de veículo elé
 
 ## Estado do projeto
 
-Em desenvolvimento. Este documento descreve a arquitetura e o comportamento previstos do sistema. As seções "Resultados" e "Alinhamento à disciplina" serão preenchidas com dados e conteúdos do sistema implementado.
+Em desenvolvimento. Este documento descreve a arquitetura e o comportamento previstos do sistema. A seção "Resultados" será preenchida com dados do sistema implementado.
 
 ## Equipe
 
@@ -21,7 +21,7 @@ O HEMS-EV (Home Energy Management System com carregamento de veículo elétrico)
 
 O sistema tem três partes:
 
-1. **Simulador.** Gera os dados que um inversor híbrido GoodWe, uma bateria GoodWe Lynx e um carregador GoodWe HCA enviariam. O projeto não usa hardware real.
+1. **Simulador.** Gera os dados que um inversor híbrido GoodWe, uma bateria GoodWe Lynx e um carregador GoodWe HCA G2 enviariam. O projeto não usa hardware real.
 2. **Motor de decisão.** Prevê a geração solar e o consumo da casa e escolhe, a cada passo de simulação, entre quatro destinos para a energia: casa, bateria, carro ou rede.
 3. **Marketplace.** Casas simuladas com excedente solar vendem energia para carros elétricos de outras casas simuladas, a um preço entre o valor pago pela energia exportada à rede e o preço da energia comprada da rede.
 
@@ -48,19 +48,19 @@ A cada passo, o sistema responde: com a energia disponível agora, para onde env
 | Requisito do desafio | Como o projeto atende |
 |---|---|
 | Geração, armazenamento e uso de energia renovável com monitoramento inteligente | Simulação de geração solar, bateria e carga com monitoramento em tempo real no dashboard |
-| Tecnologias compatíveis com a GoodWe | Simulador modelado sobre inversor híbrido ET G2, baterias Lynx Home e carregador HCA; adaptador com a mesma interface de dados da biblioteca de comunicação local `goodwe` (seção 7) |
+| Tecnologias compatíveis com a GoodWe | Simulador modelado sobre inversor híbrido ET G2, baterias Lynx F G2 e carregador HCA G2; adaptador com a mesma interface de dados da biblioteca de comunicação local `goodwe` (seção 7) |
 | Algoritmos inteligentes | Previsão de geração e consumo; planejamento de carga pelo horário de saída do carro; despacho de energia por prioridade |
 | Análise de impactos: eficiência, pegada de carbono, relevância social ou ambiental | Comparação entre cenário sem e com otimização em kWh importados, autoconsumo, custo e CO2 |
 | Interface amigável e visualização de dados | Dashboard com fluxo de energia, gráficos de geração, consumo e estado de carga |
 | Integração com assistente virtual | Integração com a ARIA (Assistente de Recarga Inteligente e Autônoma) |
-| Conexão com os conteúdos da disciplina | A preencher (seção 9) |
+| Conexão com os conteúdos da disciplina | Ver seção 9 |
 
 ## 3. Arquitetura
 
 ### 3.1 Fluxo de dados
 
 ```
-Simulador (casa, inversor ET/ES, bateria Lynx, carregador HCA)
+Simulador (casa, inversor ET G2, bateria Lynx F G2, carregador HCA G2)
         |
         v
 Adaptador (interface única: modo "simulado" ou modo "goodwe-local")
@@ -80,7 +80,7 @@ Motor de decisão (Python): previsão + despacho
 
 | Camada | Tecnologia | Função |
 |---|---|---|
-| Simulador | Python ou Node.js | Gerar dados de casa, inversor, bateria e carregador |
+| Simulador | Python | Gerar dados de casa, inversor, bateria e carregador |
 | Motor de decisão e previsão | Python | Previsão e despacho de energia |
 | Backend | Node.js com TypeScript | API e orquestração |
 | Estado em tempo real | Redis | Leitura rápida do estado atual de cada casa |
@@ -159,7 +159,7 @@ O simulador representa uma ou mais casas. Cada casa tem:
 - **Carregador EV:** potência máxima em kW, carro conectado ou não, SOC do carro, SOC alvo e hora de saída.
 - **Rede:** potência importada ou exportada em kW.
 
-Os parâmetros numéricos (capacidade da bateria, potência do painel, consumo médio) são derivados de especificações de modelos GoodWe reais e registrados nesta seção com o modelo de referência.
+Os parâmetros numéricos de cada casa estão na seção 4.3.
 
 ### 4.1 Formato dos dados
 
@@ -175,6 +175,7 @@ Cada leitura é um objeto JSON:
   "ev": {
     "connected": true,
     "soc_percent": 35.0,
+    "capacity_kwh": 60.0,
     "target_soc_percent": 80.0,
     "departure_time": "07:00",
     "charge_power_kw": 1.8
@@ -206,6 +207,46 @@ Para cada casa, a resposta de `POST /readings` traz um comando:
 - `reason`: texto curto com a regra aplicada. É exibido no dashboard e usado pela ARIA para explicar a decisão.
 
 A potência trocada com a rede não é comandada: ela resulta do balanço de energia da casa. No exemplo, 4,2 kW de geração menos 0,9 kW de carga da casa deixam 3,3 kW, que são consumidos pelo carro (1,8 kW) e pela bateria (1,5 kW), e a troca com a rede é 0 kW. O comando de um passo vale para o passo seguinte.
+
+### 4.3 Parâmetros de simulação
+
+Os valores abaixo definem a primeira versão do simulador. A coluna Origem indica se o valor vem de especificação GoodWe confirmada em fonte pública (seção 12) ou se é uma premissa de simulação, ajustável. Os perfis de geração e de consumo são sintéticos.
+
+| Parâmetro | Valor | Origem |
+|---|---|---|
+| Passo de simulação | 15 minutos | Premissa |
+| Carregador EV | GW7K-HCA-20 (linha HCA G2), potência máxima de 7 kW | Especificação GoodWe |
+| Eficiência do carregador | 100% (perdas ignoradas) | Premissa |
+| Capacidade da bateria do carro | 60 kWh | Premissa |
+| Bateria residencial | Lynx F G2, módulos de 3,2 kWh | Especificação GoodWe |
+| Potência máxima de carga e de descarga da bateria | Potência nominal da torre Lynx F G2 da ficha técnica, de 2,24 kW por módulo (4,48 kW com 2 módulos; 8,96 kW com 4 módulos), limitada à potência nominal do inversor | Especificação GoodWe; o limite pelo inversor é premissa |
+| Eficiência de carga e de descarga da bateria | 95% cada (rendimento de ida e volta de 90,25%) | Premissa |
+| SOC mínimo e máximo da bateria | 10% e 100% | Premissa |
+| Inversor | ET G2, de 6 a 15 kW nominais (6, 8, 10, 12 e 15 kW) | Especificação GoodWe |
+| Painel solar | Potência em kWp por casa; fator de desempenho do sistema de 0,80 | Premissa (a GoodWe não fabrica painéis) |
+| Curva de geração | Seno entre 06:00 e 18:00, com pico às 12:00, multiplicado pelo fator de clima do dia | Premissa |
+| Fator de clima | Ensolarado 1,0; parcialmente nublado 0,6, com variação de 20% por passo; chuvoso 0,25 | Premissa |
+| Carga da casa | Perfil por faixa horária (tabela abaixo), com variação de 10% por passo | Premissa |
+
+Perfil de carga da casa (15,0 kWh por dia):
+
+| Faixa horária | Potência |
+|---|---|
+| 00:00 a 06:00 | 0,3 kW |
+| 06:00 a 09:00 | 0,8 kW |
+| 09:00 a 17:00 | 0,5 kW |
+| 17:00 a 22:00 | 1,2 kW |
+| 22:00 a 23:59 | 0,4 kW |
+
+Casas da demonstração inicial:
+
+| Casa | Painel | Inversor | Bateria | Carro |
+|---|---|---|---|---|
+| casa-01 | 6,0 kWp | ET G2 de 6 kW | 12,8 kWh (4 módulos) | Em casa das 18:00 às 07:00; chega com SOC de 30%; meta de 80% às 07:00 |
+| casa-02 | 4,0 kWp | ET G2 de 6 kW | 6,4 kWh (2 módulos) | Em casa das 09:00 às 17:00; chega com SOC de 40%; meta de 80% às 17:00 |
+| casa-03 | 8,0 kWp | ET G2 de 8 kW | 12,8 kWh (4 módulos) | Sem carro; atua como vendedora de excedente |
+
+Os perfis exercitam os três comportamentos do sistema: a casa-01 planeja a carga noturna com bateria e tarifa por horário; a casa-02, em dias nublados, precisa de mais energia do que o próprio painel produz e compra no marketplace; a casa-03 produz mais do que consome e vende. As casas 04 a 10 serão definidas na ampliação do escopo, repetindo estes perfis com variações de painel e bateria.
 
 ## 5. Motor de decisão
 
@@ -240,13 +281,13 @@ Os dois cenários rodam sobre o mesmo dia simulado, com a mesma semente aleatór
 
 Casas com excedente solar que o próprio carro e a própria bateria não absorvem vendem essa energia a carros elétricos de outras casas simuladas que precisam carregar.
 
-- **Vendedor:** casa com excedente restante maior que zero após as prioridades 1 a 3 da seção 5.1. Publica uma oferta com quantidade em kWh e preço em R$/kWh.
+- **Vendedor:** casa com excedente solar maior que zero depois de atender a carga da casa, o carro e a bateria (seção 5.1). Publica uma oferta com quantidade em kWh e preço em R$/kWh.
 - **Comprador:** carro conectado em outra casa, com necessidade de carga não atendida. Publica uma ordem com quantidade e preço máximo.
 - **Faixa de preço:** entre o valor pago ao vendedor pela energia exportada à rede (piso) e o preço da energia comprada da rede (teto). Nessa faixa, o vendedor recebe mais que na rede e o comprador paga menos que na rede.
 - **Casamento:** ofertas e ordens são ordenadas por preço, e a negociação ocorre quando o preço da oferta é menor ou igual ao preço máximo da ordem.
 - **Registro:** cada negociação gera uma linha no MySQL com casa vendedora, casa compradora, kWh, preço e horário.
 
-O número de casas simuladas na demonstração é registrado nesta seção.
+A demonstração começa com 3 casas (seção 4.3) e é ampliada até 10 casas.
 
 ## 7. Tecnologias GoodWe e integração
 
@@ -254,22 +295,24 @@ O número de casas simuladas na demonstração é registrado nesta seção.
 
 | Equipamento | Características confirmadas em fontes públicas | Uso no projeto |
 |---|---|---|
-| Carregador EV série HCA (GW7K-HCA, GW11K-HCA, GW22K-HCA) | Carregador AC com carga por excedente solar, compatível com inversores solares e híbridos GoodWe; variantes monofásica de 7 kW e trifásicas de 11 kW e 22 kW; conexão Wi-Fi com o sistema GoodWe; acompanhamento no SEMS e no aplicativo | Modelo de carregador simulado (GW7K-HCA, monofásico) |
+| Carregador EV série HCA (GW7K-HCA, GW11K-HCA, GW22K-HCA) | Carregador AC com carga por excedente solar, compatível com inversores solares e híbridos GoodWe; variantes monofásica de 7 kW e trifásicas de 11 kW e 22 kW; conexão Wi-Fi com o sistema GoodWe; acompanhamento no SEMS e no aplicativo | Geração anterior da linha; o simulador usa a HCA G2 (linha seguinte) |
+| Carregador EV série HCA G2 (GW7K-HCA-20, GW11K-HCA-20, GW22K-HCA-20) | Carregador AC de 7, 11 e 22 kW com função de troca de fases (phase switching) para maximizar o uso de energia solar; carga totalmente solar ou complemento rápido da rede, com modos configuráveis no aplicativo GoodWe SEMS+; comunicação por Bluetooth, Wi-Fi, LAN e RS485; proteção IP66 | Modelo de carregador simulado: GW7K-HCA-20 (7 kW) |
 | Inversor híbrido ET G2 | Trifásico de alta tensão, de 6 a 15 kW, com medidor inteligente embutido, compatível com a bateria Lynx F G2 | Referência para o inversor simulado |
 | Baterias Lynx Home (F e D) | A série Lynx Home F é compatível com inversores ET e EH (híbridos) e BH e BT (de bateria) | Referência para a bateria simulada |
+| Bateria Lynx F G2 | Módulo LX F3.2-20 de 3,2 kWh; de 2 a 9 módulos por torre, de 6,4 a 28,8 kWh de energia utilizável; potência nominal da torre de 4,48 kW (2 módulos) a 20,16 kW (9 módulos); tecnologia LFP; compatível com inversores BH, EH, BT e ET | Bateria simulada (seção 4.3) |
 
-O carregador HCA já realiza carga por excedente solar por conta própria. O diferencial do HEMS-EV está na camada acima dele: previsão, planejamento pelo horário de saída do carro, uso de tarifa por horário e marketplace.
+O carregador HCA G2 já realiza carga por excedente solar por conta própria. O diferencial do HEMS-EV está na camada acima dele: previsão, planejamento pelo horário de saída do carro, uso de tarifa por horário e marketplace.
 
 ### 7.2 Interfaces de comunicação
 
 | Interface | Descrição | Situação no projeto |
 |---|---|---|
-| SEMS Portal Open API (nuvem) | API HTTPS da GoodWe com 31 interfaces em 4 grupos (usina, dispositivo, controle remoto, data logger); entrega dados brutos e dados de negócio processados pela plataforma SEMS | Exige conta organizacional e solicitação à GoodWe. Não utilizada na versão simulada |
+| SEMS Portal Open API (nuvem) | API HTTPS da GoodWe com 31 interfaces em 4 grupos (usina, dispositivo, controle remoto, data logger); entrega dados brutos e dados de negócio processados pela plataforma SEMS | Exige conta organizacional e solicitação à GoodWe. O grupo não possui credencial, e a API não é utilizada na versão simulada |
 | Protocolo local do inversor | A biblioteca Python de código aberto `goodwe` lê dados pela rede local por UDP na porta 8899, ou por Modbus/TCP na porta 502 com o dongle LAN+WiFi V2.0 (modelo WLA0000-01-00P), nas famílias ET, EH, BT, BH, ES, EM, BP, DT, MS, D-NS e XS | Protocolo mapeado pela comunidade, não documentado oficialmente pela GoodWe. Relatos da comunidade indicam que firmwares recentes de algumas linhas usam DTLS na porta 8899. É a interface de referência do adaptador |
 
 ### 7.3 Estratégia de integração
 
-O adaptador expõe uma interface única com duas implementações: `simulado` e `goodwe-local`. O simulador produz os mesmos sensores que a biblioteca `goodwe` entrega. Assim, substituir o simulador por um inversor real não exige alterar o motor de decisão, o backend nem o dashboard.
+O adaptador expõe uma interface única, com duas implementações previstas: `simulado` e `goodwe-local`. Nesta entrega, apenas `simulado` é implementada; `goodwe-local` é o caminho previsto para um inversor real e não é validada contra hardware. O simulador produz os mesmos sensores que a biblioteca `goodwe` entrega. Assim, substituir o simulador por um inversor real não exige alterar o motor de decisão, o backend nem o dashboard.
 
 ## 8. Dashboard e assistente virtual
 
@@ -287,7 +330,29 @@ A ARIA (Assistente de Recarga Inteligente e Autônoma) responde a perguntas como
 
 ## 9. Alinhamento à disciplina
 
-A preencher com os conteúdos da disciplina aplicados no projeto.
+O projeto se conecta às disciplinas Pensamento Computacional e Automação com Python e Soluções em Energias Renováveis e Sustentáveis.
+
+### 9.1 Pensamento Computacional e Automação com Python
+
+| Conceito | Aplicação no projeto |
+|---|---|
+| Decomposição | O problema é dividido em simulador, adaptador, backend, motor de decisão, marketplace, dashboard e assistente |
+| Reconhecimento de padrões | A previsão usa o padrão diário de geração solar e de consumo, hora a hora |
+| Abstração | Cada casa é modelada por um balanço de energia a cada passo de 15 minutos, sem os detalhes elétricos internos do inversor |
+| Algoritmos | Regras de prioridade do despacho (seção 5.1), cálculo do horário limite de carga do carro e casamento de ordens de compra e ofertas por preço (seção 6) |
+| Automação | Execução em lote dos cenários sem e com otimização, geração automática das métricas e do comparativo, ciclo de simulação sem intervenção manual (seção 3.4) |
+| Python | Linguagem do simulador e do motor de decisão |
+
+### 9.2 Soluções em Energias Renováveis e Sustentáveis
+
+| Conceito | Aplicação no projeto |
+|---|---|
+| Geração fotovoltaica | Curva de geração por casa, definida em kWp (seção 4.3) |
+| Armazenamento de energia | Bateria Lynx F G2 simulada, com SOC, limites de potência e eficiência (seção 4.3) |
+| Mobilidade elétrica | Carga do veículo com excedente solar pelo carregador HCA G2 e planejamento pelo horário de saída |
+| Autoconsumo e eficiência | Métricas de autoconsumo solar e de energia importada da rede (seção 10) |
+| Tarifa por horário | Tarifa branca como referência para decidir quando carregar e quando descarregar a bateria (seção 5.3) |
+| Redução de emissões | Cálculo de CO2 evitado entre os cenários sem e com otimização (seção 5.3) |
 
 ## 10. Resultados
 
@@ -315,3 +380,8 @@ A preencher com dados gerados pelo sistema implementado:
 - pv magazine Australia, ET G2: https://www.pv-magazine-australia.com/2024/12/13/goodwe-releases-three-phase-high-voltage-hybrid-inverter-in-australia
 - Solartraders, Lynx Home F: https://www.solartraders.com/en/products/batteries/bms-modules/goodwe-lynx-home-f-hv-pcu
 - Home Assistant Community, GW6000-ES-20 e DTLS: https://community.home-assistant.io/t/goodwe-gw6000-es-20-read-real-time-pv-production-locally-python-no-cloud/1016056
+- Sun.store, GoodWe GW7K-HCA-20 (HCA G2): https://sun.store/en/product/goodwe-gw7k-hca-20-50534
+- Krannich, EV Charger GW 7K-HCA G2: https://shop.krannich-solar.com/de-en/e-mobility/ac-charging-stations/71716/ev-charger-gw-7k-hca-g2
+- GoodWe, Lynx F G2 Series: https://en.goodwe.com/lynxf-g2-series
+- GoodWe, Lynx F G2 Series datasheet: https://solarproof.com.au/datasheets/battery_datasheet_GW_Lynx-F-G2_Datasheet-EN.pdf
+- GoodWe, ET G2 hybrid inverter: https://en.goodwe.com/goodwe-introduces-et-g2-hybrid-inverter-to-power-modern-homes-winner-of-the-reddot-design-award
