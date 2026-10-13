@@ -101,6 +101,7 @@ goodwe-hems-ev/
   engine/          previsão e motor de decisão
   marketplace/     ofertas, ordens e casamento
   dashboard/       interface web
+  scripts/         extração de dados externos (tarifa da ANEEL)
   docker-compose.yml
 ```
 
@@ -265,8 +266,18 @@ Modelo simples de geração e consumo por hora do dia. O erro é medido com o er
 
 ### 5.3 Tarifas e emissões
 
-- **Tarifa:** a referência é a tarifa branca, que cobra preços diferentes por horário para consumidores de baixa tensão. Os valores em R$/kWh e a fonte (distribuidora e ano) são registrados nesta seção.
-- **Fator de emissão de CO2 da rede elétrica brasileira:** valor em kg CO2/kWh, com fonte oficial e ano, registrado nesta seção.
+- **Tarifa:** a referência é a tarifa branca, que cobra preços diferentes por horário para consumidores de baixa tensão. A distribuidora de referência é a Enel SP. Em dias úteis, os postos horários são: ponta das 17:30 às 20:30; intermediário das 16:30 às 17:30 e das 20:30 às 21:30; fora de ponta nas demais horas. Aos fins de semana e feriados nacionais, vale fora de ponta o dia todo. Os valores em R$/kWh são a soma da TE e da TUSD de cada posto na modalidade Branca, extraídas do conjunto de dados "Tarifas de aplicação das distribuidoras de energia elétrica" da ANEEL. Os valores vigentes, consultados em 12/10/2026, estão na tabela abaixo.
+- **Fator de emissão de CO2 da rede elétrica brasileira:** fator médio mensal do Sistema Interligado Nacional publicado pelo MCTI na plataforma SIRENE, em kg CO2/MWh, dividido por 1000 para obter kg CO2/kWh. O valor adotado, o período de referência e a data da consulta são registrados nesta seção.
+
+Tarifa branca residencial (subgrupo B1) da Enel SP, sem tributos, em vigor de 04/07/2026 a 03/07/2027. No arquivo da ANEEL, a distribuidora aparece com a sigla ELETROPAULO.
+
+| Posto | TUSD (R$/MWh) | TE (R$/MWh) | Total (R$/MWh) | Total (R$/kWh) |
+|---|---|---|---|---|
+| Fora ponta | 367,33 | 301,91 | 669,24 | 0,6692 |
+| Intermediário | 682,59 | 301,91 | 984,50 | 0,9845 |
+| Ponta | 997,85 | 482,45 | 1480,30 | 1,4803 |
+
+O simulador usa esses valores sem tributos (ICMS e PIS/COFINS não são incluídos). Em reais, os resultados ficam abaixo dos de uma conta real. Fonte: conjunto de dados "Tarifas de aplicação das distribuidoras de energia elétrica", ANEEL, extraído com `scripts/extrair_tarifa_enel_sp.py`.
 
 ### 5.4 Cenários comparados
 
@@ -369,6 +380,8 @@ A preencher com dados gerados pelo sistema implementado:
 - Sistemas de gestão de energia residencial já existem. As contribuições do projeto são a combinação de previsão, reserva de bateria pelo horário de saída do carro, comparativo de CO2, marketplace entre vizinhos e assistente em linguagem natural.
 - A venda direta de energia entre particulares está sujeita à regulação do setor elétrico brasileiro. O marketplace é tratado como simulação acadêmica.
 - A integração com a SEMS Open API depende de credencial fornecida pela GoodWe. A versão atual usa o adaptador simulado.
+- As tarifas usadas são as publicadas pela ANEEL, sem tributos. Os valores em reais são menores que os de uma conta de energia real.
+- O fator de emissão de CO2 da rede elétrica brasileira é baixo: o MCTI publicou valores mensais entre 21,5 e 28,9 kg CO2/MWh nos primeiros meses de 2025. Por isso, a redução de CO2 em kg é pequena em comparação com a economia em reais. Esse resultado reflete a matriz elétrica brasileira, em que fontes limpas responderam por 88,2% da oferta interna de energia elétrica em 2024, segundo a EPE, e não uma falha do sistema.
 
 ## 12. Referências
 
@@ -385,3 +398,7 @@ A preencher com dados gerados pelo sistema implementado:
 - GoodWe, Lynx F G2 Series: https://en.goodwe.com/lynxf-g2-series
 - GoodWe, Lynx F G2 Series datasheet: https://solarproof.com.au/datasheets/battery_datasheet_GW_Lynx-F-G2_Datasheet-EN.pdf
 - GoodWe, ET G2 hybrid inverter: https://en.goodwe.com/goodwe-introduces-et-g2-hybrid-inverter-to-power-modern-homes-winner-of-the-reddot-design-award
+- ANEEL, Tarifas de aplicação das distribuidoras de energia elétrica (dados abertos): https://dadosabertos.aneel.gov.br/dataset/tarifas-distribuidoras-energia-eletrica
+- Idec, tarifa branca (horários em São Paulo): https://idec.org.br/node/26342
+- MCTI, nota técnica sobre os fatores de emissão do SIN (jun/2025): https://cenarioenergia.com.br/wp-content/uploads/2025/06/NT_FE_jun25.pdf
+- Canal Solar, emissões de CO2 da geração elétrica (MCTI e EPE): https://canalsolar.com.br/emissoes-de-co%e2%82%82-geracao-eletrica-mcti/

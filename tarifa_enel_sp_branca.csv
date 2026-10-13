@@ -1,0 +1,7 @@
+SigAgente;DatInicioVigencia;DatFimVigencia;DscSubClasse;DscDetalhe;NomPostoTarifario;unidade;TUSD;TE;TUSD_mais_TE;TUSD_mais_TE_R$_por_kWh
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;Não se aplica;Fora ponta;MWh;367.33;301.91;669.24;0.6692
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;Não se aplica;Intermediário;MWh;682.59;301.91;984.50;0.9845
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;Não se aplica;Ponta;MWh;997.85;482.45;1480.30;1.4803
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;SCEE;Fora ponta;MWh;367.33;37.36;404.69;0.4047
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;SCEE;Intermediário;MWh;682.59;37.36;719.95;0.7200
+ELETROPAULO;2026-07-04;2027-07-03;Residencial;SCEE;Ponta;MWh;997.85;37.36;1035.21;1.0352
