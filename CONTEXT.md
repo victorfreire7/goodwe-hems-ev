@@ -86,6 +86,9 @@ Observação de carga: o motor de decisão e o marketplace concentram o diferenc
 | 2026-10-13 | Sem divisão fixa de obrigações na dupla do código: o Victor atribui tarefas ao Gabriel Cavaloti quando necessário | DECIDIDO |
 | 2026-10-13 | Perfis de geração solar e de consumo derivados de dados públicos, explicitado na documentação | DECIDIDO |
 | 2026-10-17 | Fontes dos dados públicos: INMET (estação A701) para geração solar e ECD-UY (Uruguai) para consumo; origem uruguaia declarada como limitação | DECIDIDO (aprovado pelo Victor) |
+| 2026-10-17 | README sob responsabilidade do Victor (escrito com o Claude) | DECIDIDO |
+| 2026-10-17 | Repositório na conta do Victor, público; comentários em português; nomes de arquivos e pastas mantidos em inglês como no README (campos JSON da API também em inglês); mensagens de commit em inglês; o Gabriel Cavaloti commita com a própria conta; `CONTEXT.md` público com as notas internas | DECIDIDO |
+| 2026-10-17 | Corte de escopo, se faltar tempo: 1) simulador, motor e comparativo; 2) dashboard; 3) marketplace; 4) ARIA integrada. Entrega parcial aceita (por exemplo, marketplace só como regra no motor, sem tela própria) | DECIDIDO |
 
 Itens do README que ainda são PROPOSTA e precisam de validação do grupo: formato JSON do simulador, passo de simulação de 15 minutos, regras de despacho do motor, regras de preço e casamento do marketplace, stack e estrutura de pastas do repositório, parâmetros numéricos da seção 4.3 do README, ciclo de execução em passos com comando de retorno ao simulador (resposta do POST /readings), formato do comando, lista de endpoints da API e modos de execução (lote e tempo acelerado).
 
@@ -138,11 +141,9 @@ A numeração original dos pontos foi mantida (outros trechos e o histórico a c
 
 ### 9.1 Crítico: decidir ou resolver agora
 
-19. PENDENTE, corte de escopo. Definir a ordem de prioridade se faltar tempo. Sugestão a validar: 1) simulador, motor e comparativo; 2) dashboard; 3) marketplace; 4) ARIA integrada. Por que é crítico: com 6 dias e a maior parte do código ainda por fazer, sem uma regra de corte o grupo descobre o que não cabe tarde demais. Decidir hoje.
+22. PARCIAL, repositório. DECIDIDO em 2026-10-17: conta do Victor, visibilidade pública (o link do .txt abre para o professor), comentários em português, nomes de arquivos e pastas em inglês como no README, campos JSON em inglês, mensagens de commit em inglês, Gabriel Cavaloti commita com a própria conta (o Victor precisa adicioná-lo como colaborador), `CONTEXT.md` público com as notas internas (o Victor confirmou que não interfere). PENDENTE: convenção de branches (sugestão simples: `main` estável e uma branch curta por tarefa).
 
-22. PENDENTE, repositório. Conta dona do repositório, visibilidade (se for privado, o professor precisa de acesso, senão o link do .txt não abre), convenção de branches e commits (commits em inglês), idioma do código e dos comentários, e se cada integrante commita com a própria conta para o histórico mostrar a contribuição de todos. Por que é crítico: o repositório vale 15 pontos e um link que não abre invalida a entrega do .txt. Decisão rápida; fazer hoje.
-
-2. PARCIAL, responsável por README, diagramas, organização do repositório e .txt. Código com Victor e Gabriel Cavaloti (sem divisão fixa de obrigações; o Victor atribui tarefas ao Gabriel quando necessário); gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem fica com README, diagramas, repositório e .txt (sugestão: Lucas e Davi, já que o código sobrecarrega Victor e Gabriel). Por que é crítico: o README, os diagramas e o .txt têm dono indefinido e os diagramas precisam de imagens reais do sistema (enunciado, seção 1).
+2. PARCIAL, responsável por README, diagramas, organização do repositório e .txt. DECIDIDO em 2026-10-17: o README é do Victor (escrito com o Claude). Continuam sem dono: diagramas e .txt de entrega. Código com Victor e Gabriel Cavaloti (sem divisão fixa de obrigações; o Victor atribui tarefas ao Gabriel quando necessário); gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem fica com README, diagramas, repositório e .txt (sugestão: Lucas e Davi, já que o código sobrecarrega Victor e Gabriel). Por que é crítico: o README, os diagramas e o .txt têm dono indefinido e os diagramas precisam de imagens reais do sistema (enunciado, seção 1).
 
 15. PARCIAL, dados públicos. DECIDIDO em 2026-10-13 e fontes aprovadas pelo Victor em 2026-10-17: dados públicos nos perfis de geração solar (INMET, estação automática A701 Mirante de Santana) e de consumo (conjunto residencial público ECD-UY, do Uruguai; alternativa: curva de carga horária do ONS). Script de geração pronto e testado só com arquivo sintético: `scripts/preparar_geracao_inmet.py`. PENDENTE: baixar os ZIPs do INMET para `dados/brutos/inmet/` e rodar o script; baixar o subconjunto THC da ECD-UY e escrever o script de consumo depois de conferir o formato real do arquivo (nome dos arquivos e primeiras linhas). Enquanto os dados não forem processados, o README usa curvas sintéticas. Risco que motivou a decisão: se o simulador gera os dados e o modelo de previsão aprende com eles, o erro de previsão fica artificialmente baixo e a banca pode questionar. Por que é crítico: o simulador e a previsão dependem desses perfis, e o download é manual.
 
@@ -176,6 +177,8 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 
 ### 9.5 Concluídos
 
+19. RESOLVIDO em 2026-10-17: corte de escopo, na ordem em que os blocos caem se faltar tempo: 1) simulador, motor e comparativo; 2) dashboard; 3) marketplace; 4) ARIA integrada. Aceita entrega parcial de um bloco (por exemplo, marketplace só como regra no motor, sem tela própria). Base: 60 dos 100 pontos dependem de o sistema funcionar (seção 2), e o núcleo é o que prova isso.
+
 1. RESOLVIDO: entrega em 2026-10-23 (sexta-feira). Restou apenas confirmar se as duas sprints de tema livre têm a mesma data.
 3. RESOLVIDO: valores definidos pelo Claude a pedido do Victor (README, seção 4.3), com carregador da linha HCA G2, bateria Lynx F G2 e inversor ET G2. Falta validação do grupo (ver 9.3).
 6. RESOLVIDO: começar com 3 casas e ampliar até 10 se houver tempo.
@@ -201,3 +204,5 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-13 | Nome completo do Victor registrado; fim da divisão A/B na dupla do código; decisão de usar dados públicos nos perfis (ponto 15) registrada, com as fontes ainda em proposta |
 | 2026-10-17 | Fontes aprovadas (INMET A701 e ECD-UY); criados `scripts/preparar_geracao_inmet.py`, `dados/` e regra no .gitignore para `dados/brutos/` |
 | 2026-10-17 | Seção 9 reorganizada por prioridade e gravidade (crítico, alto, médio, baixo, concluídos), mantendo a numeração original |
+| 2026-10-17 | Pontos 2 e 22 atualizados: README do Victor; repositório público na conta do Victor, comentários em português, commits em inglês |
+| 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |
