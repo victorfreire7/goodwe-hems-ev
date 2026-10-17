@@ -259,7 +259,7 @@ Os perfis de geração solar e de consumo vêm de bases públicas, para que a pr
 | Dado | Fonte | Detalhes |
 |---|---|---|
 | Geração solar | INMET, estação automática A701 (São Paulo - Mirante de Santana), dados históricos horários | Radiação global em kJ/m2 por hora, em UTC, arquivos anuais em https://portal.inmet.gov.br/dadoshistoricos |
-| Consumo residencial | ECD-UY (detailed household electricity consumption dataset of Uruguay), subconjunto THC, medições de 15 minutos | 110.953 domicílios, de 2019-01-01 a 2020-11-03 |
+| Consumo residencial | ECD-UY (detailed household electricity consumption dataset of Uruguay), subconjunto THC (consumo total do domicílio) | 110.953 domicílios, de 2019-01-01 a 2020-11-03; intervalo de amostragem do subconjunto a confirmar nos arquivos |
 
 Tratamento da radiação solar (`scripts/preparar_geracao_inmet.py`):
 
@@ -270,7 +270,7 @@ Tratamento da radiação solar (`scripts/preparar_geracao_inmet.py`):
 5. Classifica cada dia com pelo menos 22 horas válidas, pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
 6. Lista, por classe, os dias mais recentes que têm 7 dias válidos anteriores, que servem de histórico para a previsão.
 
-Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular o perfil médio de 15 minutos para dia útil e para fim de semana e normalizá-lo para o consumo diário de cada casa (15,0 kWh na casa de referência da seção 4.3).
+Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular o perfil médio por passo de 15 minutos (reamostrando, se o intervalo original for outro) para dia útil e para fim de semana e normalizá-lo para o consumo diário de cada casa (15,0 kWh na casa de referência da seção 4.3).
 
 Limitações dos dados: a radiação é medida em um único ponto da cidade; o consumo vem de domicílios uruguaios, com hábitos e clima diferentes dos brasileiros, e por isso só o formato da curva diária é aproveitado, não os valores absolutos. A origem uruguaia está declarada na seção 11.
 
