@@ -139,13 +139,33 @@ Regras de trabalho: nenhum número entra na seção de resultados sem ter sido g
 
 A numeração original dos pontos foi mantida (outros trechos e o histórico a citam). Ordem: gravidade primeiro, depois urgência. Critério de gravidade: o que bloqueia a implementação ou a entrega vem antes do que apenas melhora a qualidade; 60 dos 100 pontos dependem de o sistema funcionar (seção 2). Os pontos concluídos estão no fim. Situação em 2026-10-17: faltam 6 dias para a entrega e o congelamento do código está previsto para 2026-10-20 (seção 8).
 
-### 9.1 Crítico: decidir ou resolver agora
+### Resumo: ordem de importância e situação (2026-10-17)
 
-22. PARCIAL, repositório. DECIDIDO em 2026-10-17: conta do Victor, visibilidade pública (o link do .txt abre para o professor), comentários em português, nomes de arquivos e pastas em inglês como no README, campos JSON em inglês, mensagens de commit em inglês, Gabriel Cavaloti commita com a própria conta (o Victor precisa adicioná-lo como colaborador), `CONTEXT.md` público com as notas internas (o Victor confirmou que não interfere). Branches DECIDIDO em 2026-10-17: commits direto na `main`; se o Victor sentir necessidade de uma branch nova, ele a cria e avisa quando fizer o checkout. Ponto praticamente concluído.
+Pontos abertos, do mais para o menos importante:
+
+| Ordem | Ponto | Assunto | Situação | O que falta |
+|---|---|---|---|---|
+| 1 | 15 | Dados públicos de geração e consumo | PARCIAL | Baixar os ZIPs do INMET e rodar o script; decidir se a ECD-UY entra agora ou fica opcional (curva sintética no consumo) |
+| 2 | 5 | Método de previsão | PENDENTE | Escolher o método (sugestão: média móvel por hora, com persistência como comparação) |
+| 3 | 2 | Responsável por diagramas e .txt de entrega | PARCIAL | README já é do Victor; faltam diagramas e .txt |
+| 4 | 17 | Preço no marketplace e piso (SCEE) | PENDENTE | Definir formação de preço e entender o SCEE |
+| 5 | 18 | Perfil do comprador no marketplace | PENDENTE | Decidir junto com o 17 |
+| 6 | 23 | Execução e testes | PENDENTE | Seção de como executar e critérios de aceitação no README; fica com Victor e Gabriel |
+| 7 | 16 | Cenários de teste | PENDENTE | Escolher quantidade de dias e perfis |
+| 8 | 4 | Fator de CO2 (tarifa já resolvida) | PARCIAL | Baixar o fator do SIRENE; confirmar Enel SP por uma conta de energia |
+| 9 | 8 | Implementação atual e integração da ARIA | PENDENTE | Victor informar como a ARIA funciona hoje |
+| 10 | 21 | ARIA na gravação do vídeo | PENDENTE | Verificar dependência de API externa e plano alternativo |
+| 11 | 20 | Framework do dashboard | PENDENTE | Escolher a biblioteca do front-end |
+| 12 | - | Validação do grupo dos itens do README em PROPOSTA | PENDENTE | Grupo revisar a lista da seção 5 |
+| 13 | 11 | Pesquisa sobre regulação | PENDENTE | Consultar fonte oficial |
+
+Pontos concluídos (detalhe em 9.5): 22, 19, 1, 3, 6, 7, 9, 10, 12, 13 e 14.
+
+### 9.1 Crítico: decidir ou resolver agora
 
 2. PARCIAL, responsável por README, diagramas, organização do repositório e .txt. DECIDIDO em 2026-10-17: o README é do Victor (escrito com o Claude). Continuam sem dono: diagramas e .txt de entrega. Código com Victor e Gabriel Cavaloti (sem divisão fixa de obrigações; o Victor atribui tarefas ao Gabriel quando necessário); gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem fica com README, diagramas, repositório e .txt (sugestão: Lucas e Davi, já que o código sobrecarrega Victor e Gabriel). Por que é crítico: o README, os diagramas e o .txt têm dono indefinido e os diagramas precisam de imagens reais do sistema (enunciado, seção 1).
 
-15. PARCIAL, dados públicos. DECIDIDO em 2026-10-13 e fontes aprovadas pelo Victor em 2026-10-17: dados públicos nos perfis de geração solar (INMET, estação automática A701 Mirante de Santana) e de consumo (conjunto residencial público ECD-UY, do Uruguai; alternativa: curva de carga horária do ONS). Script de geração pronto e testado só com arquivo sintético: `scripts/preparar_geracao_inmet.py`. PENDENTE: baixar os ZIPs do INMET para `dados/brutos/inmet/` e rodar o script; baixar o subconjunto THC da ECD-UY e escrever o script de consumo depois de conferir o formato real do arquivo (nome dos arquivos e primeiras linhas). Enquanto os dados não forem processados, o README usa curvas sintéticas. Risco que motivou a decisão: se o simulador gera os dados e o modelo de previsão aprende com eles, o erro de previsão fica artificialmente baixo e a banca pode questionar. Por que é crítico: o simulador e a previsão dependem desses perfis, e o download é manual.
+15. PARCIAL, dados públicos. DECIDIDO em 2026-10-13 e fontes aprovadas pelo Victor em 2026-10-17: dados públicos nos perfis de geração solar (INMET, estação automática A701 Mirante de Santana) e de consumo (conjunto residencial público ECD-UY, do Uruguai; alternativa: curva de carga horária do ONS). Script de geração pronto e testado só com arquivo sintético: `scripts/preparar_geracao_inmet.py`. PENDENTE: baixar os ZIPs do INMET para `dados/brutos/inmet/` e rodar o script; baixar o subconjunto THC da ECD-UY e escrever o script de consumo depois de conferir o formato real do arquivo (nome dos arquivos e primeiras linhas). Enquanto os dados não forem processados, o README usa curvas sintéticas. Risco que motivou a decisão: se o simulador gera os dados e o modelo de previsão aprende com eles, o erro de previsão fica artificialmente baixo e a banca pode questionar. Por que é crítico: o simulador e a previsão dependem desses perfis, e o download é manual. DECISÃO PENDENTE do Victor (2026-10-17): a ECD-UY não é essencial; a sugestão é usar o INMET agora e começar o consumo com a curva sintética da seção 4.3 do README, com ruído e variação entre dia útil e fim de semana, deixando a ECD-UY como melhoria opcional. O intervalo de amostragem e o formato dos arquivos da ECD-UY não estão confirmados.
 
 5. PENDENTE, método de previsão. Persistência, média móvel por hora e regressão linear foram explicados ao Victor. Sugestão: média móvel por hora como método principal e persistência como comparação (precisa de 7 dias de histórico real, que o script do INMET lista). Por que é crítico: o motor de decisão não pode ser escrito sem essa escolha, e a previsão é um dos algoritmos inteligentes exigidos.
 
@@ -179,6 +199,7 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 
 19. RESOLVIDO em 2026-10-17: corte de escopo, na ordem em que os blocos caem se faltar tempo: 1) simulador, motor e comparativo; 2) dashboard; 3) marketplace; 4) ARIA integrada. Aceita entrega parcial de um bloco (por exemplo, marketplace só como regra no motor, sem tela própria). Base: 60 dos 100 pontos dependem de o sistema funcionar (seção 2), e o núcleo é o que prova isso.
 
+22. RESOLVIDO em 2026-10-17: repositório na conta do Victor, público (o link do .txt abre para o professor); comentários em português; nomes de arquivos e pastas e campos JSON em inglês; mensagens de commit em inglês; commits direto na `main` (se o Victor criar uma branch, ele avisa ao fazer o checkout); Gabriel Cavaloti commita com a própria conta; `CONTEXT.md` público com as notas internas. Ação do Victor: adicionar o Gabriel como colaborador no GitHub (Settings, Collaborators).
 1. RESOLVIDO: entrega em 2026-10-23 (sexta-feira). Restou apenas confirmar se as duas sprints de tema livre têm a mesma data.
 3. RESOLVIDO: valores definidos pelo Claude a pedido do Victor (README, seção 4.3), com carregador da linha HCA G2, bateria Lynx F G2 e inversor ET G2. Falta validação do grupo (ver 9.3).
 6. RESOLVIDO: começar com 3 casas e ampliar até 10 se houver tempo.
@@ -206,4 +227,5 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-17 | Seção 9 reorganizada por prioridade e gravidade (crítico, alto, médio, baixo, concluídos), mantendo a numeração original |
 | 2026-10-17 | Pontos 2 e 22 atualizados: README do Victor; repositório público na conta do Victor, comentários em português, commits em inglês |
 | 2026-10-17 | Branches: commits na `main`; execução e testes (23) ficam com Victor e Gabriel sem atribuição prévia de tarefas; README: intervalo de amostragem da ECD-UY marcado como a confirmar |
+| 2026-10-17 | Seção 9: tabela-resumo com ordem de importância e situação de cada ponto; ponto 22 movido para concluídos; decisão pendente sobre a ECD-UY registrada no ponto 15 |
 | 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |
