@@ -51,18 +51,18 @@ Apenas um arquivo .txt contendo: nome e RM de cada integrante, link do vídeo no
 
 ## 4. Equipe e divisão de tarefas
 
-Equipe: Davi Ramos (RM 571744), Lucas Galle Melchior (RM 574027), Victor (RM 571099), Gabriel Cavaloti (RM 571643).
+Equipe: Davi Ramos (RM 571744), Lucas Galle Melchior (RM 574027), Victor Hugo Ferreira Freire (RM 571099), Gabriel Cavaloti (RM 571643).
 
-Divisão em duas duplas (DECIDIDO em 2026-10-11): código com Victor e Gabriel Cavaloti; gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem faz cada papel dentro da dupla e quem fica com README, diagramas, organização do repositório e .txt de entrega. A distribuição de papéis abaixo é PROPOSTA.
+Divisão em duas duplas (DECIDIDO em 2026-10-11): código com Victor e Gabriel Cavaloti; gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Dentro da dupla do código não há divisão fixa de obrigações: o Victor atribui tarefas ao Gabriel Cavaloti quando necessário (DECIDIDO em 2026-10-13). Falta definir quem fica com README final, diagramas, organização do repositório e .txt de entrega. A distribuição dos papéis C e D abaixo é PROPOSTA.
 
 | Papel | Dupla | Responsabilidade |
 |---|---|---|
-| A (proposta: Victor, por perfil backend) | Código | Simulador, adaptador GoodWe, backend Node/TypeScript, Redis, MySQL, Docker Compose |
-| B | Código | Motor de decisão, previsão, comparativo antes/depois, marketplace, dashboard, integração com a ARIA |
+| Código | Código | Victor Hugo Ferreira Freire coordena e atribui tarefas ao Gabriel Cavaloti quando necessário. Escopo: simulador, adaptador GoodWe, backend Node/TypeScript, Redis, MySQL, Docker Compose, motor de decisão, previsão, comparativo antes/depois, marketplace, dashboard e integração com a ARIA |
+| Código | Código | Gabriel Cavaloti: tarefas atribuídas pelo Victor, sem divisão fixa de obrigações |
 | C | Vídeo | Roteiro de 5 minutos, gravação da demonstração, edição, upload no YouTube como não listado |
 | D | Documentação | README final, diagramas, organização do repositório GitHub, arquivo .txt de entrega |
 
-Observação de carga: o papel B concentra o diferencial técnico (algoritmo e marketplace) e a parte visual que aparece no vídeo. A dupla do vídeo pode apoiar o layout do dashboard, sem alterar a lógica.
+Observação de carga: o motor de decisão e o marketplace concentram o diferencial técnico, e o dashboard é a parte visual que aparece no vídeo. A dupla do vídeo pode apoiar o layout do dashboard, sem alterar a lógica.
 
 ## 5. Decisões tomadas
 
@@ -83,6 +83,9 @@ Observação de carga: o papel B concentra o diferencial técnico (algoritmo e m
 | 2026-10-11 | Disciplinas: Pensamento Computacional e Automação com Python; Soluções em Energias Renováveis e Sustentáveis | DECIDIDO |
 | 2026-10-11 | Sem credencial da SEMS Open API: adaptador implementa apenas o modo simulado nesta entrega | PROPOSTA |
 | 2026-10-11 | Valores numéricos do simulador definidos pelo Claude a pedido do Victor (README, seção 4.3) | PROPOSTA (falta validação do grupo) |
+| 2026-10-13 | Sem divisão fixa de obrigações na dupla do código: o Victor atribui tarefas ao Gabriel Cavaloti quando necessário | DECIDIDO |
+| 2026-10-13 | Perfis de geração solar e de consumo derivados de dados públicos, explicitado na documentação | DECIDIDO |
+| 2026-10-17 | Fontes dos dados públicos: INMET (estação A701) para geração solar e ECD-UY (Uruguai) para consumo; origem uruguaia declarada como limitação | DECIDIDO (aprovado pelo Victor) |
 
 Itens do README que ainda são PROPOSTA e precisam de validação do grupo: formato JSON do simulador, passo de simulação de 15 minutos, regras de despacho do motor, regras de preço e casamento do marketplace, stack e estrutura de pastas do repositório, parâmetros numéricos da seção 4.3 do README, ciclo de execução em passos com comando de retorno ao simulador (resposta do POST /readings), formato do comando, lista de endpoints da API e modos de execução (lote e tempo acelerado).
 
@@ -132,7 +135,7 @@ Regras de trabalho: nenhum número entra na seção de resultados sem ter sido g
 ## 9. Pontos em aberto
 
 1. RESOLVIDO: entrega em 2026-10-23 (sexta-feira). Confirmar se as duas sprints de tema livre têm a mesma data.
-2. PARCIAL: código com Victor e Gabriel Cavaloti; gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem faz A e B, quem faz C e D, e quem fica com README, diagramas, repositório e .txt (sugestão: Lucas e Davi, já que o código sobrecarrega Victor e Gabriel).
+2. PARCIAL: código com Victor e Gabriel Cavaloti (sem divisão fixa de obrigações; o Victor atribui tarefas ao Gabriel quando necessário); gravação e edição do vídeo com Lucas Galle Melchior e Davi Ramos. Falta definir quem fica com README, diagramas, repositório e .txt (sugestão: Lucas e Davi, já que o código sobrecarrega Victor e Gabriel).
 3. RESOLVIDO: valores definidos pelo Claude a pedido do Victor (README, seção 4.3), com carregador da linha HCA G2, bateria Lynx F G2 e inversor ET G2. Falta validação do grupo.
 4. Valores de tarifa por horário e fator de emissão de CO2. Caminho definido: a tarifa vem do CSV "tarifas-homologadas-distribuidoras-energia-eletrica" do portal de dados abertos da ANEEL (atualização semanal), filtrando pelo CNPJ da Enel SP (61695227000193; no arquivo o nome pode aparecer como Eletropaulo, e a busca por "ENEL SP" não retornou resultado), modalidade Branca, subgrupo B1, classe residencial, base tarifária "Tarifa de Aplicação" e vigência mais recente (o reajuste de 2026 vale a partir de 04/07/2026), somando TE e TUSD (R$/MWh dividido por 1000); o CO2 vem do fator médio mensal do SIN no SIRENE (MCTI). TARIFA RESOLVIDA: valores de 04/07/2026 a 03/07/2027 extraídos em 2026-10-12 com `scripts/extrair_tarifa_enel_sp.py` (sigla ELETROPAULO no arquivo) e registrados no README (seção 5.3); os valores provisórios de fonte secundária foram descartados. PENDENTE: confirmar Enel SP como distribuidora de referência; baixar o fator de CO2 mais recente. Ordem de grandeza confirmada em reportagens, não no SIRENE: 21,5 a 28,9 kg CO2/MWh por mês nos primeiros meses de 2025 e 38,5 kg CO2/MWh em 2023; o fator é baixo, e a redução de CO2 em kg será pequena frente à economia em reais.
 5. Método de previsão: persistência, média móvel por hora e regressão linear foram explicados ao Victor. Decisão pendente; sugestão: média móvel por hora como método principal e persistência como comparação.
@@ -142,15 +145,15 @@ Regras de trabalho: nenhum número entra na seção de resultados sem ter sido g
 9. RESOLVIDO: Pensamento Computacional e Automação com Python; Soluções em Energias Renováveis e Sustentáveis (README, seção 9). Conferir se os conceitos citados na seção 9 batem com a ementa de cada disciplina. Candidatos considerados antes: Candidatos: estruturas de dados e algoritmos (fila de prioridade no casamento de ordens), modelagem e previsão (regressão), banco de dados (histórico e livro-razão), arquitetura de computadores (sensores e comunicação, se aplicável).
 10. RESOLVIDO: o grupo não possui credencial; a SEMS Open API não será usada.
 11. Pesquisa em fonte oficial sobre a regulação de venda de energia entre particulares no Brasil, para refinar a seção 11 do README.
-12. Nome completo do Victor para o arquivo .txt e para o README.
-13. Validação entre os papéis A e B do formato do comando de retorno ao simulador e da lista de endpoints da API (README, seções 3.4 a 3.6 e 4.2).
+12. RESOLVIDO: Victor Hugo Ferreira Freire (RM 571099), registrado no README e neste arquivo.
+13. RESOLVIDO: não há divisão fixa de obrigações entre Victor e Gabriel Cavaloti; o Victor atribui tarefas ao Gabriel quando necessário. O formato do comando de retorno ao simulador e a lista de endpoints da API (README, seções 3.4 a 3.6 e 4.2) seguem como proposta, sem etapa de validação entre papéis.
 14. RESOLVIDO na seção 4.3 do README (valores definidos pelo Claude, falta validação do grupo); itens cobertos: capacidade da bateria do carro em kWh (usada na regra 2 do motor, mas ausente do contrato JSON da seção 4.1; acrescentar `ev.capacity_kwh`), eficiência de carga e descarga da bateria, SOC mínimo e máximo da bateria, perdas do carregador, e quais casas têm carro, bateria e qual tamanho de painel (casas homogêneas ou não).
-15. Fonte dos perfis de geração solar e de consumo: a seção 4.3 do README adota curvas sintéticas na primeira versão; decidir se mantém ou usa dados públicos (irradiação solar de São Paulo, perfil residencial). Risco: se o simulador gera os dados e o modelo de previsão aprende com eles, o erro de previsão fica artificialmente baixo e a banca pode questionar. Mitigação possível: ruído, dias de clima diferentes ou dados externos.
+15. DECIDIDO em 2026-10-13 e fontes aprovadas pelo Victor em 2026-10-17: dados públicos nos perfis de geração solar (INMET, estação automática A701 Mirante de Santana) e de consumo (conjunto residencial público ECD-UY, do Uruguai; alternativa: curva de carga horária do ONS). Script de geração pronto e testado só com arquivo sintético: `scripts/preparar_geracao_inmet.py`. PENDENTE: baixar os ZIPs do INMET para `dados/brutos/inmet/` e rodar o script; baixar o subconjunto THC da ECD-UY e escrever o script de consumo depois de conferir o formato real do arquivo. Enquanto os dados não forem processados, o README usa curvas sintéticas. Ponto original: fonte dos perfis, com curvas sintéticas na primeira versão e a opção de usar dados públicos (irradiação solar de São Paulo, perfil residencial). Risco: se o simulador gera os dados e o modelo de previsão aprende com eles, o erro de previsão fica artificialmente baixo e a banca pode questionar. Mitigação possível: ruído, dias de clima diferentes ou dados externos.
 16. Cenários de teste: quantos dias simulados e quais perfis (ensolarado, parcialmente nublado, chuvoso; dia útil e fim de semana). A seção 10 do README prevê "porcentagem de dias em que o carro atingiu o SOC alvo", o que exige vários dias.
 17. Formação de preço no marketplace: o README define piso e teto, mas não como vendedor e comprador escolhem o preço dentro da faixa (ponto médio fixo ou dinâmico por oferta e demanda). Também definir como modelar o piso: no Brasil, a energia injetada na rede por geração distribuída costuma virar crédito de energia (sistema de compensação) e não pagamento em dinheiro. Verificar em fonte oficial. Observação: o arquivo da ANEEL traz, para a mesma distribuidora, linhas com detalhe SCEE (Sistema de Compensação de Energia Elétrica) em que a TE é de 37,36 R$/MWh nos três postos, com a mesma TUSD das demais linhas. O significado exato para modelar o valor da energia exportada não foi confirmado e precisa ser entendido antes de definir o piso do marketplace.
 18. Perfil do comprador no marketplace: definir por que um carro compra de um vizinho em vez de usar o carregador próprio ou a rede (por exemplo, compra quando o preço é menor que a tarifa da rede) e se o custo de uso da rede para transportar a energia é ignorado (e declarado como limitação) ou modelado.
 19. Corte de escopo: ordem de prioridade se faltar tempo. Sugestão a validar: 1) simulador, motor e comparativo; 2) dashboard; 3) marketplace; 4) ARIA integrada.
-20. Dashboard: framework ou biblioteca do front-end e do diagrama de fluxo de energia (o README diz apenas "página web"). O papel B precisa dominar a escolha.
+20. Dashboard: framework ou biblioteca do front-end e do diagrama de fluxo de energia (o README diz apenas "página web"). Quem construir o dashboard precisa dominar a escolha.
 21. ARIA na demonstração: verificar se depende de API de modelo de linguagem (chave, custo, internet durante a gravação) e definir um plano alternativo para a gravação do vídeo.
 22. Repositório: conta dona do repositório, visibilidade (se for privado, o professor precisa de acesso, senão o link do .txt não abre), convenção de branches e commits (commits em inglês), idioma do código e dos comentários, e se cada integrante commita com a própria conta para o histórico mostrar a contribuição de todos.
 23. Execução e testes: o README ainda não tem seção de como executar (comando do Docker Compose, versões de Node e Python, portas) nem critérios de aceitação. Sugestão a validar: carro atinge o SOC alvo em 100% dos dias simulados; bateria nunca viola o SOC mínimo e máximo; o balanço de energia fecha a cada passo dentro de uma tolerância; o comparativo é reproduzível com a mesma semente.
@@ -167,3 +170,5 @@ Regras de trabalho: nenhum número entra na seção de resultados sem ter sido g
 | 2026-10-12 | README (seção 5.3): postos horários da Enel SP e fontes de tarifa (ANEEL) e de CO2 (MCTI); ponto em aberto 4 com o caminho para obter os valores |
 | 2026-10-12 | Tarifa branca da Enel SP extraída da base da ANEEL e registrada no README (seção 5.3); limitação de tarifas sem tributos adicionada à seção 11; observação sobre linhas SCEE no ponto 17 |
 | 2026-10-12 | README: referências de tarifa e CO2 adicionadas à seção 12 e limitação sobre o fator de emissão baixo na seção 11; CONTEXT: ordem de grandeza do fator de CO2 no ponto 4 |
+| 2026-10-13 | Nome completo do Victor registrado; fim da divisão A/B na dupla do código; decisão de usar dados públicos nos perfis (ponto 15) registrada, com as fontes ainda em proposta |
+| 2026-10-17 | Fontes aprovadas (INMET A701 e ECD-UY); criados `scripts/preparar_geracao_inmet.py`, `dados/` e regra no .gitignore para `dados/brutos/` |

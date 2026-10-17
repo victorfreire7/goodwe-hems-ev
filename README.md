@@ -12,7 +12,7 @@ Em desenvolvimento. Este documento descreve a arquitetura e o comportamento prev
 |---|---|
 | Davi Ramos | 571744 |
 | Lucas Galle Melchior | 574027 |
-| Victor | 571099 |
+| Victor Hugo Ferreira Freire | 571099 |
 | Gabriel Cavaloti | 571643 |
 
 ## 1. Visão geral
@@ -101,7 +101,10 @@ goodwe-hems-ev/
   engine/          previsão e motor de decisão
   marketplace/     ofertas, ordens e casamento
   dashboard/       interface web
-  scripts/         extração de dados externos (tarifa da ANEEL)
+  scripts/         extração e preparo de dados externos (tarifa da ANEEL, radiação do INMET, consumo da ECD-UY)
+  dados/
+    brutos/        arquivos baixados das fontes públicas; não versionados (.gitignore)
+    processados/   perfis e classificação de dias gerados pelos scripts; versionados
   docker-compose.yml
 ```
 
@@ -211,7 +214,7 @@ A potência trocada com a rede não é comandada: ela resulta do balanço de ene
 
 ### 4.3 Parâmetros de simulação
 
-Os valores abaixo definem a primeira versão do simulador. A coluna Origem indica se o valor vem de especificação GoodWe confirmada em fonte pública (seção 12) ou se é uma premissa de simulação, ajustável. Os perfis de geração e de consumo são sintéticos.
+Os valores abaixo definem a primeira versão do simulador. A coluna Origem indica se o valor vem de especificação GoodWe confirmada em fonte pública (seção 12) ou se é uma premissa de simulação, ajustável. Os perfis de geração solar e de consumo são construídos a partir de dados públicos, descritos na seção 4.4. Enquanto os dados não forem processados, o simulador usa as curvas sintéticas das premissas abaixo.
 
 | Parâmetro | Valor | Origem |
 |---|---|---|
@@ -248,6 +251,28 @@ Casas da demonstração inicial:
 | casa-03 | 8,0 kWp | ET G2 de 8 kW | 12,8 kWh (4 módulos) | Sem carro; atua como vendedora de excedente |
 
 Os perfis exercitam os três comportamentos do sistema: a casa-01 planeja a carga noturna com bateria e tarifa por horário; a casa-02, em dias nublados, precisa de mais energia do que o próprio painel produz e compra no marketplace; a casa-03 produz mais do que consome e vende. As casas 04 a 10 serão definidas na ampliação do escopo, repetindo estes perfis com variações de painel e bateria.
+
+### 4.4 Dados públicos de geração e consumo
+
+Os perfis de geração solar e de consumo vêm de bases públicas, para que a previsão do motor (seção 5.2) seja avaliada sobre dados que o simulador não gerou. Se a previsão fosse treinada sobre curvas sintéticas do próprio simulador, o erro ficaria artificialmente baixo.
+
+| Dado | Fonte | Detalhes |
+|---|---|---|
+| Geração solar | INMET, estação automática A701 (São Paulo - Mirante de Santana), dados históricos horários | Radiação global em kJ/m2 por hora, em UTC, arquivos anuais em https://portal.inmet.gov.br/dadoshistoricos |
+| Consumo residencial | ECD-UY (detailed household electricity consumption dataset of Uruguay), subconjunto THC, medições de 15 minutos | 110.953 domicílios, de 2019-01-01 a 2020-11-03 |
+
+Tratamento da radiação solar (`scripts/preparar_geracao_inmet.py`):
+
+1. Lê os arquivos da estação A701 (.CSV ou .zip) em `dados/brutos/inmet/`; separador ";", codificação latin-1, vírgula decimal; valores iguais ou abaixo de -9990 são tratados como ausentes.
+2. Converte o horário de UTC para o horário local (UTC-3).
+3. Converte radiação acumulada na hora (kJ/m2) em irradiância média da hora (kW/m2), dividindo por 3600.
+4. Grava `dados/processados/perfil_solar_sp.csv` (colunas `timestamp_local` e `irradiancia_kw_m2`). A geração de cada casa em um passo é a irradiância multiplicada pelo kWp da casa e pelo fator de desempenho de 0,80 (seção 4.3).
+5. Classifica cada dia com pelo menos 22 horas válidas, pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
+6. Lista, por classe, os dias mais recentes que têm 7 dias válidos anteriores, que servem de histórico para a previsão.
+
+Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular o perfil médio de 15 minutos para dia útil e para fim de semana e normalizá-lo para o consumo diário de cada casa (15,0 kWh na casa de referência da seção 4.3).
+
+Limitações dos dados: a radiação é medida em um único ponto da cidade; o consumo vem de domicílios uruguaios, com hábitos e clima diferentes dos brasileiros, e por isso só o formato da curva diária é aproveitado, não os valores absolutos. A origem uruguaia está declarada na seção 11.
 
 ## 5. Motor de decisão
 
@@ -378,6 +403,7 @@ A preencher com dados gerados pelo sistema implementado:
 
 - Os resultados são obtidos por simulação, não por medição em campo.
 - Sistemas de gestão de energia residencial já existem. As contribuições do projeto são a combinação de previsão, reserva de bateria pelo horário de saída do carro, comparativo de CO2, marketplace entre vizinhos e assistente em linguagem natural.
+- O perfil de consumo vem de domicílios do Uruguai (ECD-UY), não do Brasil. A curva diária é usada como forma do consumo, escalada para o consumo diário de cada casa simulada; hábitos de consumo e clima do Uruguai diferem dos de São Paulo. A radiação solar, ao contrário, é medida em São Paulo (INMET, estação A701).
 - A venda direta de energia entre particulares está sujeita à regulação do setor elétrico brasileiro. O marketplace é tratado como simulação acadêmica.
 - A integração com a SEMS Open API depende de credencial fornecida pela GoodWe. A versão atual usa o adaptador simulado.
 - As tarifas usadas são as publicadas pela ANEEL, sem tributos. Os valores em reais são menores que os de uma conta de energia real.
@@ -399,6 +425,9 @@ A preencher com dados gerados pelo sistema implementado:
 - GoodWe, Lynx F G2 Series datasheet: https://solarproof.com.au/datasheets/battery_datasheet_GW_Lynx-F-G2_Datasheet-EN.pdf
 - GoodWe, ET G2 hybrid inverter: https://en.goodwe.com/goodwe-introduces-et-g2-hybrid-inverter-to-power-modern-homes-winner-of-the-reddot-design-award
 - ANEEL, Tarifas de aplicação das distribuidoras de energia elétrica (dados abertos): https://dadosabertos.aneel.gov.br/dataset/tarifas-distribuidoras-energia-eletrica
+- INMET, dados históricos (estação A701): https://portal.inmet.gov.br/dadoshistoricos
+- ECD-UY, detailed household electricity consumption dataset of Uruguay (artigo): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8776758/
+- ECD-UY, dados (Springer Nature, figshare): https://springernature.figshare.com/collections/ECD-UY_Detailed_household_electricity_consumption_dataset_of_Uruguay/5428608
 - Idec, tarifa branca (horários em São Paulo): https://idec.org.br/node/26342
 - MCTI, nota técnica sobre os fatores de emissão do SIN (jun/2025): https://cenarioenergia.com.br/wp-content/uploads/2025/06/NT_FE_jun25.pdf
 - Canal Solar, emissões de CO2 da geração elétrica (MCTI e EPE): https://canalsolar.com.br/emissoes-de-co%e2%82%82-geracao-eletrica-mcti/
