@@ -1,8 +1,8 @@
 """Extrai da base de tarifas homologadas da ANEEL a tarifa branca residencial (B1)
 da Enel SP na vigencia mais recente.
 
-Entrada: tarifas-homologadas-distribuidoras-energia-eletrica.csv (raiz do projeto)
-Saida:   tarifa_enel_sp_branca.csv (raiz do projeto) e um resumo no terminal
+Entrada: dados/brutos/aneel/tarifas-homologadas-distribuidoras-energia-eletrica.csv
+Saida:   dados/processados/tarifa_enel_sp_branca.csv e um resumo no terminal
 
 Uso: python scripts/extrair_tarifa_enel_sp.py
 """
@@ -10,8 +10,9 @@ import csv
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-ENTRADA = RAIZ / "tarifas-homologadas-distribuidoras-energia-eletrica.csv"
-SAIDA = RAIZ / "tarifa_enel_sp_branca.csv"
+ENTRADA = RAIZ / "dados" / "brutos" / "aneel" / "tarifas-homologadas-distribuidoras-energia-eletrica.csv"
+SAIDA = RAIZ / "dados" / "processados" / "tarifa_enel_sp_branca.csv"
+SAIDA.parent.mkdir(parents=True, exist_ok=True)
 CNPJ_ENEL_SP = "61695227000193"
 
 

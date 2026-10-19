@@ -234,4 +234,5 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-17 | Branches: commits na `main`; execução e testes (23) ficam com Victor e Gabriel sem atribuição prévia de tarefas; README: intervalo de amostragem da ECD-UY marcado como a confirmar |
 | 2026-10-17 | Seção 9: tabela-resumo com ordem de importância e situação de cada ponto; ponto 22 movido para concluídos; decisão pendente sobre a ECD-UY registrada no ponto 15 |
 | 2026-10-19 | Análise do código do Gabriel (marketplace, validação, testes); modelo `financial_only` decidido; pontos 17 (parcial), 18 (resolvido) e 23 (parcial) atualizados; README: seção 6, 4.2, 11 e estrutura com `tests/` |
+| 2026-10-19 | Repositório preparado: CSVs movidos para `dados/brutos/aneel/` e `dados/processados/`, script da tarifa ajustado, `.gitignore` completo (Node, .env, .venv), pastas `simulator/`, `adapter/`, `backend/`, `dashboard/`, `docs/` e `dados/*` criadas com `.gitkeep` |
 | 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |

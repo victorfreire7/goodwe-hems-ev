@@ -1,8 +1,17 @@
-# Base completa da ANEEL (86 MB). Nao versionar; o script em scripts/ extrai o que o projeto usa.
-tarifas-homologadas-distribuidoras-energia-eletrica.csv
+# Dados publicos brutos (base da ANEEL de 86 MB, INMET, ECD-UY). Cada pessoa baixa localmente;
+# os scripts em scripts/ extraem o que o projeto usa e gravam em dados/processados/ (versionado).
+# As pastas existem no repositorio apenas pelo .gitkeep.
+dados/brutos/**
+!dados/brutos/**/
+!dados/brutos/**/.gitkeep
 
-# Dados publicos brutos (INMET, ECD-UY). Cada pessoa baixa localmente; os processados em dados/processados/ sao versionados.
-dados/brutos/
+# Node, ambientes e arquivos locais
+node_modules/
+dist/
+.env
+.venv/
+*.log
+.DS_Store
 
 __pycache__/
 *.pyc

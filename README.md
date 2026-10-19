@@ -104,7 +104,7 @@ goodwe-hems-ev/
   tests/           testes automatizados (unittest) do marketplace e da validação de leituras
   scripts/         extração e preparo de dados externos (tarifa da ANEEL, radiação do INMET, consumo da ECD-UY)
   dados/
-    brutos/        arquivos baixados das fontes públicas; não versionados (.gitignore)
+    brutos/        arquivos baixados das fontes públicas (aneel/, inmet/); não versionados (.gitignore)
     processados/   perfis e classificação de dias gerados pelos scripts; versionados
   docker-compose.yml
 ```
@@ -303,7 +303,7 @@ Tarifa branca residencial (subgrupo B1) da Enel SP, sem tributos, em vigor de 04
 | Intermediário | 682,59 | 301,91 | 984,50 | 0,9845 |
 | Ponta | 997,85 | 482,45 | 1480,30 | 1,4803 |
 
-O simulador usa esses valores sem tributos (ICMS e PIS/COFINS não são incluídos). Em reais, os resultados ficam abaixo dos de uma conta real. Fonte: conjunto de dados "Tarifas de aplicação das distribuidoras de energia elétrica", ANEEL, extraído com `scripts/extrair_tarifa_enel_sp.py`.
+O simulador usa esses valores sem tributos (ICMS e PIS/COFINS não são incluídos). Em reais, os resultados ficam abaixo dos de uma conta real. Fonte: conjunto de dados "Tarifas de aplicação das distribuidoras de energia elétrica", ANEEL, extraído com `scripts/extrair_tarifa_enel_sp.py`, que lê `dados/brutos/aneel/tarifas-homologadas-distribuidoras-energia-eletrica.csv` e grava `dados/processados/tarifa_enel_sp_branca.csv`.
 
 ### 5.4 Cenários comparados
 
