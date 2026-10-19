@@ -3,3 +3,6 @@ tarifas-homologadas-distribuidoras-energia-eletrica.csv
 
 # Dados publicos brutos (INMET, ECD-UY). Cada pessoa baixa localmente; os processados em dados/processados/ sao versionados.
 dados/brutos/
+
+__pycache__/
+*.pyc

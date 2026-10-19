@@ -171,6 +171,10 @@ Pontos concluídos (detalhe em 9.5): 22, 19, 1, 3, 6, 7, 9, 10, 12, 13 e 14.
 
 ### 9.2 Alto: necessário para o sistema integrado e para os resultados
 
+Atualização em 2026-10-19: implementação inicial dos pontos 17/18 em `marketplace/matching.py`, com regra de preço médio sujeita à validação do grupo. Valor de exportação e integração com o motor continuam pendentes.
+
+No ponto 23, marketplace e validador possuem testes unitários; comando no README 13. Simulador, backend e testes integrados continuam pendentes. Os registros abaixo mantêm as demais decisões e pendências.
+
 17. PENDENTE, formação de preço no marketplace. O README define piso e teto, mas não como vendedor e comprador escolhem o preço dentro da faixa (ponto médio fixo ou dinâmico por oferta e demanda). Também definir como modelar o piso: no Brasil, a energia injetada na rede por geração distribuída costuma virar crédito de energia (sistema de compensação) e não pagamento em dinheiro. Verificar em fonte oficial. Observação: o arquivo da ANEEL traz, para a mesma distribuidora, linhas com detalhe SCEE (Sistema de Compensação de Energia Elétrica) em que a TE é de 37,36 R$/MWh nos três postos, com a mesma TUSD das demais linhas. O significado exato para modelar o valor da energia exportada não foi confirmado e precisa ser entendido antes de definir o piso do marketplace. Bloqueia o código do marketplace (que é o diferencial do projeto).
 
 18. PENDENTE, perfil do comprador no marketplace. Definir por que um carro compra de um vizinho em vez de usar o carregador próprio ou a rede (por exemplo, compra quando o preço é menor que a tarifa da rede) e se o custo de uso da rede para transportar a energia é ignorado (e declarado como limitação) ou modelado. Decidir junto com o ponto 17.

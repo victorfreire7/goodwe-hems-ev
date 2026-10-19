@@ -325,6 +325,8 @@ Casas com excedente solar que o próprio carro e a própria bateria não absorve
 
 A demonstração começa com 3 casas (seção 4.3) e é ampliada até 10 casas.
 
+A implementação inicial está em `marketplace/matching.py`: preço médio entre o valor de oportunidade da exportação e a tarifa do comprador, prioridade por preço e desempate por casa. Uma casa não pode comprar e vender no mesmo passo. Essa regra de preço é uma proposta; o valor de exportação e a integração com o motor ainda estão pendentes.
+
 ## 7. Tecnologias GoodWe e integração
 
 ### 7.1 Equipamentos de referência
@@ -431,3 +433,15 @@ A preencher com dados gerados pelo sistema implementado:
 - Idec, tarifa branca (horários em São Paulo): https://idec.org.br/node/26342
 - MCTI, nota técnica sobre os fatores de emissão do SIN (jun/2025): https://cenarioenergia.com.br/wp-content/uploads/2025/06/NT_FE_jun25.pdf
 - Canal Solar, emissões de CO2 da geração elétrica (MCTI e EPE): https://canalsolar.com.br/emissoes-de-co%e2%82%82-geracao-eletrica-mcti/
+
+## 13. Testes
+
+Testado com Python 3.12, sem dependências externas para os módulos novos:
+
+```sh
+python -m unittest discover -s tests -v
+```
+
+Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço de potência, SOC, limites de potência, EV desconectado e compra/venda simultânea. O validador recebe leituras do mesmo intervalo de 15 minutos e o modelo de troca: `ideal_microgrid` inclui a energia interna no balanço; `financial_only` considera apenas o fluxo físico da rede.
+
+Ainda faltam testes integrados com simulador e backend, evolução temporal do SOC e cumprimento do prazo de carga do carro.
