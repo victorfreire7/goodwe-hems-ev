@@ -1,4 +1,4 @@
-"""Prepara o perfil de radiacao solar de Sao Paulo com os dados horarios do INMET.
+g"""Prepara o perfil de radiacao solar de Sao Paulo com os dados horarios do INMET.
 
 Entrada: arquivos da estacao A701 (Sao Paulo - Mirante de Santana) em
          dados/brutos/inmet/. Aceita os .CSV ou os .zip anuais baixados em

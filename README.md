@@ -101,6 +101,7 @@ goodwe-hems-ev/
   engine/          previsão e motor de decisão
   marketplace/     ofertas, ordens e casamento
   dashboard/       interface web
+  tests/           testes automatizados (unittest) do marketplace e da validação de leituras
   scripts/         extração e preparo de dados externos (tarifa da ANEEL, radiação do INMET, consumo da ECD-UY)
   dados/
     brutos/        arquivos baixados das fontes públicas; não versionados (.gitignore)
@@ -207,7 +208,7 @@ Para cada casa, a resposta de `POST /readings` traz um comando:
 
 - `ev_charge_power_kw`: potência ordenada ao carregador, em kW.
 - `battery_power_kw`: potência ordenada à bateria, com a mesma convenção da seção 4.1 (positivo descarrega, negativo carrega).
-- `market.sold_kwh` e `market.bought_kwh`: energia vendida e comprada no marketplace no passo, em kWh (potência em kW multiplicada por 0,25 h).
+- `market.sold_kwh` e `market.bought_kwh`: energia vendida e comprada no marketplace no passo, em kWh (potência em kW multiplicada por 0,25 h). Tem efeito financeiro apenas: não altera o balanço físico da casa (seção 6).
 - `reason`: texto curto com a regra aplicada. É exibido no dashboard e usado pela ARIA para explicar a decisão.
 
 A potência trocada com a rede não é comandada: ela resulta do balanço de energia da casa. No exemplo, 4,2 kW de geração menos 0,9 kW de carga da casa deixam 3,3 kW, que são consumidos pelo carro (1,8 kW) e pela bateria (1,5 kW), e a troca com a rede é 0 kW. O comando de um passo vale para o passo seguinte.
@@ -320,7 +321,9 @@ Casas com excedente solar que o próprio carro e a própria bateria não absorve
 - **Vendedor:** casa com excedente solar maior que zero depois de atender a carga da casa, o carro e a bateria (seção 5.1). Publica uma oferta com quantidade em kWh e preço em R$/kWh.
 - **Comprador:** carro conectado em outra casa, com necessidade de carga não atendida. Publica uma ordem com quantidade e preço máximo.
 - **Faixa de preço:** entre o valor pago ao vendedor pela energia exportada à rede (piso) e o preço da energia comprada da rede (teto). Nessa faixa, o vendedor recebe mais que na rede e o comprador paga menos que na rede.
-- **Casamento:** ofertas e ordens são ordenadas por preço, e a negociação ocorre quando o preço da oferta é menor ou igual ao preço máximo da ordem.
+- **Preço da negociação:** média entre o piso da oferta e o teto da ordem.
+- **Casamento:** as ofertas são ordenadas por piso crescente e as ordens por teto decrescente, com desempate por `house_id`. A negociação só ocorre quando o piso da oferta é estritamente menor que o teto da ordem, para que vendedor e comprador ganhem em relação à rede. Cada casa tem no máximo uma oferta e uma ordem por passo, uma casa não compra e vende no mesmo passo, e as sobras expiram ao fim do passo. Implementado em `marketplace/matching.py`.
+- **Modelo físico:** a energia negociada passa fisicamente pela rede elétrica (modelo `financial_only`). O marketplace altera apenas o valor em R$ de cada casa; o balanço de energia de cada casa fecha com a potência da rede, como na seção 4.2. A verificação do balanço, do SOC e dos limites de potência a cada passo está em `engine/validation.py`.
 - **Registro:** cada negociação gera uma linha no MySQL com casa vendedora, casa compradora, kWh, preço e horário.
 
 A demonstração começa com 3 casas (seção 4.3) e é ampliada até 10 casas.
@@ -406,6 +409,7 @@ A preencher com dados gerados pelo sistema implementado:
 - Os resultados são obtidos por simulação, não por medição em campo.
 - Sistemas de gestão de energia residencial já existem. As contribuições do projeto são a combinação de previsão, reserva de bateria pelo horário de saída do carro, comparativo de CO2, marketplace entre vizinhos e assistente em linguagem natural.
 - O perfil de consumo vem de domicílios do Uruguai (ECD-UY), não do Brasil. A curva diária é usada como forma do consumo, escalada para o consumo diário de cada casa simulada; hábitos de consumo e clima do Uruguai diferem dos de São Paulo. A radiação solar, ao contrário, é medida em São Paulo (INMET, estação A701).
+- No marketplace, a energia negociada passa pela rede e o custo de uso da rede (transporte) entre vendedor e comprador não é modelado; o valor da energia exportada usado como piso é uma premissa de simulação.
 - A venda direta de energia entre particulares está sujeita à regulação do setor elétrico brasileiro. O marketplace é tratado como simulação acadêmica.
 - A integração com a SEMS Open API depende de credencial fornecida pela GoodWe. A versão atual usa o adaptador simulado.
 - As tarifas usadas são as publicadas pela ANEEL, sem tributos. Os valores em reais são menores que os de uma conta de energia real.
@@ -442,6 +446,6 @@ Testado com Python 3.12, sem dependências externas para os módulos novos:
 python -m unittest discover -s tests -v
 ```
 
-Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço de potência, SOC, limites de potência, EV desconectado e compra/venda simultânea. O validador recebe leituras do mesmo intervalo de 15 minutos e o modelo de troca: `ideal_microgrid` inclui a energia interna no balanço; `financial_only` considera apenas o fluxo físico da rede.
+Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço de potência, SOC, limites de potência, EV desconectado e compra/venda simultânea. O validador recebe leituras do mesmo intervalo de 15 minutos e o modelo de troca: `ideal_microgrid` inclui a energia interna no balanço; `financial_only` considera apenas o fluxo físico da rede. O sistema adota `financial_only` (seção 6).
 
 Ainda faltam testes integrados com simulador e backend, evolução temporal do SOC e cumprimento do prazo de carga do carro.
