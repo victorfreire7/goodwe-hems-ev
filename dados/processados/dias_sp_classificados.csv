@@ -1,0 +1,610 @@
+data;irradiacao_kwh_m2;horas_validas;razao_p90;classe
+2025-01-01;5.528;12;0.84;ensolarado
+2025-01-02;7.628;12;1.16;ensolarado
+2025-01-03;6.982;12;1.06;ensolarado
+2025-01-04;5.799;12;0.88;ensolarado
+2025-01-05;6.476;12;0.98;ensolarado
+2025-01-06;6.362;12;0.97;ensolarado
+2025-01-07;4.547;12;0.69;parcialmente nublado
+2025-01-08;5.436;12;0.82;ensolarado
+2025-01-09;3.997;12;0.61;parcialmente nublado
+2025-01-10;6.011;12;0.91;ensolarado
+2025-01-11;6.719;12;1.02;ensolarado
+2025-01-12;4.467;12;0.68;parcialmente nublado
+2025-01-13;4.162;12;0.63;parcialmente nublado
+2025-01-14;3.191;12;0.48;parcialmente nublado
+2025-01-15;6.158;12;0.93;ensolarado
+2025-01-16;4.743;12;0.72;parcialmente nublado
+2025-01-17;3.226;12;0.49;parcialmente nublado
+2025-01-18;6.411;12;0.97;ensolarado
+2025-01-19;4.859;12;0.74;parcialmente nublado
+2025-01-20;6.119;11;0.93;ensolarado
+2025-01-21;6.726;12;1.02;ensolarado
+2025-01-22;6.477;12;0.98;ensolarado
+2025-01-23;5.246;11;0.80;ensolarado
+2025-01-24;4.785;12;0.73;parcialmente nublado
+2025-01-25;6.894;12;1.05;ensolarado
+2025-01-26;4.225;12;0.64;parcialmente nublado
+2025-01-27;3.013;12;0.46;parcialmente nublado
+2025-01-28;4.063;12;0.62;parcialmente nublado
+2025-01-29;2.074;12;0.31;chuvoso
+2025-01-30;2.304;12;0.35;chuvoso
+2025-01-31;3.814;11;0.58;parcialmente nublado
+2025-02-01;3.787;12;0.57;parcialmente nublado
+2025-02-02;4.589;12;0.70;parcialmente nublado
+2025-02-03;3.271;12;0.50;parcialmente nublado
+2025-02-04;4.822;12;0.73;parcialmente nublado
+2025-02-05;5.738;12;0.87;ensolarado
+2025-02-06;7.409;12;1.12;ensolarado
+2025-02-07;4.982;12;0.76;ensolarado
+2025-02-08;6.436;12;0.98;ensolarado
+2025-02-09;7.330;11;1.11;ensolarado
+2025-02-10;5.358;11;0.81;ensolarado
+2025-02-11;7.187;12;1.09;ensolarado
+2025-02-12;6.711;11;1.02;ensolarado
+2025-02-13;4.422;11;0.67;parcialmente nublado
+2025-02-14;3.639;11;0.55;parcialmente nublado
+2025-02-15;6.098;11;0.93;ensolarado
+2025-02-16;6.740;11;1.02;ensolarado
+2025-02-17;7.914;11;1.20;ensolarado
+2025-02-18;4.288;11;0.65;parcialmente nublado
+2025-02-19;6.638;11;1.01;ensolarado
+2025-02-20;5.989;11;0.91;ensolarado
+2025-02-21;4.317;11;0.65;parcialmente nublado
+2025-02-22;5.618;11;0.85;ensolarado
+2025-02-23;5.334;11;0.81;ensolarado
+2025-02-24;6.956;11;1.06;ensolarado
+2025-02-25;6.061;11;0.92;ensolarado
+2025-02-27;5.678;11;0.86;ensolarado
+2025-02-28;6.394;11;0.97;ensolarado
+2025-03-01;7.256;11;1.10;ensolarado
+2025-03-02;7.136;11;1.08;ensolarado
+2025-03-03;6.893;11;1.05;ensolarado
+2025-03-04;7.102;11;1.08;ensolarado
+2025-03-05;6.592;11;1.00;ensolarado
+2025-03-06;6.777;11;1.03;ensolarado
+2025-03-07;6.841;11;1.04;ensolarado
+2025-03-08;6.031;11;0.91;ensolarado
+2025-03-09;6.795;11;1.03;ensolarado
+2025-03-10;5.830;11;0.88;ensolarado
+2025-03-11;4.801;11;0.73;parcialmente nublado
+2025-03-12;5.484;11;0.83;ensolarado
+2025-03-13;5.294;11;0.80;ensolarado
+2025-03-14;3.696;11;0.56;parcialmente nublado
+2025-03-16;1.304;11;0.20;chuvoso
+2025-03-17;3.479;11;0.53;parcialmente nublado
+2025-03-18;4.764;11;0.72;parcialmente nublado
+2025-03-19;3.151;11;0.48;parcialmente nublado
+2025-03-21;5.575;11;0.85;ensolarado
+2025-03-22;6.403;11;0.97;ensolarado
+2025-03-23;2.867;11;0.43;parcialmente nublado
+2025-03-25;4.285;11;0.65;parcialmente nublado
+2025-03-26;3.137;11;0.48;parcialmente nublado
+2025-03-27;5.843;11;0.89;ensolarado
+2025-03-28;4.850;11;0.74;parcialmente nublado
+2025-03-29;4.873;11;0.74;parcialmente nublado
+2025-03-30;4.937;11;0.75;parcialmente nublado
+2025-03-31;4.137;11;0.63;parcialmente nublado
+2025-04-01;4.858;11;0.74;parcialmente nublado
+2025-04-02;5.914;11;0.90;ensolarado
+2025-04-03;3.460;11;0.52;parcialmente nublado
+2025-04-04;2.834;11;0.43;parcialmente nublado
+2025-04-05;2.087;11;0.32;chuvoso
+2025-04-06;2.793;11;0.42;parcialmente nublado
+2025-04-07;4.069;11;0.62;parcialmente nublado
+2025-04-08;5.214;11;0.79;ensolarado
+2025-04-10;2.827;11;0.43;parcialmente nublado
+2025-04-11;4.386;11;0.67;parcialmente nublado
+2025-04-13;4.641;11;0.70;parcialmente nublado
+2025-04-14;2.018;12;0.31;chuvoso
+2025-04-15;4.681;11;0.71;parcialmente nublado
+2025-04-16;3.346;11;0.51;parcialmente nublado
+2025-04-17;4.493;11;0.68;parcialmente nublado
+2025-04-18;3.663;11;0.56;parcialmente nublado
+2025-04-19;4.784;11;0.73;parcialmente nublado
+2025-04-20;2.208;11;0.33;chuvoso
+2025-04-21;2.436;11;0.37;parcialmente nublado
+2025-04-22;2.543;11;0.39;parcialmente nublado
+2025-04-23;4.109;11;0.62;parcialmente nublado
+2025-04-24;3.329;11;0.50;parcialmente nublado
+2025-04-25;1.272;11;0.19;chuvoso
+2025-04-26;3.362;11;0.51;parcialmente nublado
+2025-04-27;3.529;11;0.54;parcialmente nublado
+2025-04-28;2.636;11;0.40;parcialmente nublado
+2025-04-29;2.559;11;0.39;parcialmente nublado
+2025-04-30;5.133;11;0.78;ensolarado
+2025-05-01;4.632;11;0.70;parcialmente nublado
+2025-05-02;5.294;11;0.80;ensolarado
+2025-05-03;4.155;11;0.63;parcialmente nublado
+2025-05-04;4.758;11;0.72;parcialmente nublado
+2025-05-05;4.531;11;0.69;parcialmente nublado
+2025-05-06;4.781;11;0.73;parcialmente nublado
+2025-05-07;4.170;11;0.63;parcialmente nublado
+2025-05-08;4.702;11;0.71;parcialmente nublado
+2025-05-09;4.878;11;0.74;parcialmente nublado
+2025-05-10;1.686;11;0.26;chuvoso
+2025-05-11;0.851;11;0.13;chuvoso
+2025-05-12;2.625;11;0.40;parcialmente nublado
+2025-05-13;3.289;11;0.50;parcialmente nublado
+2025-05-14;4.066;11;0.62;parcialmente nublado
+2025-05-15;4.850;11;0.74;parcialmente nublado
+2025-05-16;4.027;11;0.61;parcialmente nublado
+2025-05-18;4.674;11;0.71;parcialmente nublado
+2025-05-19;4.609;11;0.70;parcialmente nublado
+2025-05-20;4.478;11;0.68;parcialmente nublado
+2025-05-21;3.742;11;0.57;parcialmente nublado
+2025-05-22;2.789;11;0.42;parcialmente nublado
+2025-05-23;1.840;11;0.28;chuvoso
+2025-05-25;4.016;11;0.61;parcialmente nublado
+2025-05-26;3.689;11;0.56;parcialmente nublado
+2025-05-27;4.109;11;0.62;parcialmente nublado
+2025-05-28;3.296;11;0.50;parcialmente nublado
+2025-05-29;3.433;11;0.52;parcialmente nublado
+2025-05-30;4.356;11;0.66;parcialmente nublado
+2025-05-31;3.790;11;0.58;parcialmente nublado
+2025-06-01;4.030;11;0.61;parcialmente nublado
+2025-06-02;3.535;11;0.54;parcialmente nublado
+2025-06-03;2.018;11;0.31;chuvoso
+2025-06-04;4.394;11;0.67;parcialmente nublado
+2025-06-05;2.313;11;0.35;parcialmente nublado
+2025-06-06;1.013;11;0.15;chuvoso
+2025-06-07;2.902;11;0.44;parcialmente nublado
+2025-06-08;1.641;11;0.25;chuvoso
+2025-06-10;1.986;11;0.30;chuvoso
+2025-06-11;2.028;11;0.31;chuvoso
+2025-06-12;2.524;11;0.38;parcialmente nublado
+2025-06-13;4.332;11;0.66;parcialmente nublado
+2025-06-14;3.211;11;0.49;parcialmente nublado
+2025-06-15;1.840;11;0.28;chuvoso
+2025-06-16;3.949;11;0.60;parcialmente nublado
+2025-06-17;4.263;11;0.65;parcialmente nublado
+2025-06-18;4.261;11;0.65;parcialmente nublado
+2025-06-19;4.019;11;0.61;parcialmente nublado
+2025-06-20;4.134;11;0.63;parcialmente nublado
+2025-06-21;2.330;11;0.35;parcialmente nublado
+2025-06-22;1.962;11;0.30;chuvoso
+2025-06-23;2.034;11;0.31;chuvoso
+2025-06-24;3.502;12;0.53;parcialmente nublado
+2025-06-25;4.124;11;0.63;parcialmente nublado
+2025-06-26;4.189;11;0.64;parcialmente nublado
+2025-06-28;3.374;11;0.51;parcialmente nublado
+2025-06-29;4.119;11;0.62;parcialmente nublado
+2025-06-30;2.188;11;0.33;chuvoso
+2025-07-01;0.738;11;0.11;chuvoso
+2025-07-02;0.754;11;0.11;chuvoso
+2025-07-03;0.508;11;0.08;chuvoso
+2025-07-04;2.119;11;0.32;chuvoso
+2025-07-05;4.124;11;0.63;parcialmente nublado
+2025-07-06;3.805;11;0.58;parcialmente nublado
+2025-07-07;4.096;11;0.62;parcialmente nublado
+2025-07-08;4.140;11;0.63;parcialmente nublado
+2025-07-09;3.331;11;0.51;parcialmente nublado
+2025-07-10;3.891;11;0.59;parcialmente nublado
+2025-07-11;2.955;11;0.45;parcialmente nublado
+2025-07-12;3.367;11;0.51;parcialmente nublado
+2025-07-13;4.096;11;0.62;parcialmente nublado
+2025-07-14;4.108;11;0.62;parcialmente nublado
+2025-07-15;4.361;11;0.66;parcialmente nublado
+2025-07-16;4.439;11;0.67;parcialmente nublado
+2025-07-17;4.193;11;0.64;parcialmente nublado
+2025-07-18;3.671;11;0.56;parcialmente nublado
+2025-07-19;4.503;11;0.68;parcialmente nublado
+2025-07-20;3.073;11;0.47;parcialmente nublado
+2025-07-21;3.836;11;0.58;parcialmente nublado
+2025-07-22;4.074;11;0.62;parcialmente nublado
+2025-07-23;4.489;11;0.68;parcialmente nublado
+2025-07-24;3.710;11;0.56;parcialmente nublado
+2025-07-25;1.079;11;0.16;chuvoso
+2025-07-26;4.130;11;0.63;parcialmente nublado
+2025-07-28;3.751;11;0.57;parcialmente nublado
+2025-07-29;5.140;11;0.78;ensolarado
+2025-07-30;4.814;11;0.73;parcialmente nublado
+2025-07-31;4.873;11;0.74;parcialmente nublado
+2025-08-01;4.905;11;0.74;parcialmente nublado
+2025-08-02;4.724;11;0.72;parcialmente nublado
+2025-08-03;4.981;11;0.76;ensolarado
+2025-08-04;2.848;11;0.43;parcialmente nublado
+2025-08-05;2.240;11;0.34;chuvoso
+2025-08-06;2.210;11;0.34;chuvoso
+2025-08-07;4.540;11;0.69;parcialmente nublado
+2025-08-08;3.601;11;0.55;parcialmente nublado
+2025-08-09;3.192;11;0.48;parcialmente nublado
+2025-08-10;1.872;11;0.28;chuvoso
+2025-08-11;3.697;11;0.56;parcialmente nublado
+2025-08-12;5.259;11;0.80;ensolarado
+2025-08-13;5.523;11;0.84;ensolarado
+2025-08-14;5.386;11;0.82;ensolarado
+2025-08-15;4.705;11;0.71;parcialmente nublado
+2025-08-16;4.090;11;0.62;parcialmente nublado
+2025-08-17;4.691;11;0.71;parcialmente nublado
+2025-08-18;4.292;11;0.65;parcialmente nublado
+2025-08-19;3.725;11;0.57;parcialmente nublado
+2025-08-20;3.808;11;0.58;parcialmente nublado
+2025-08-21;4.007;11;0.61;parcialmente nublado
+2025-08-22;5.347;11;0.81;ensolarado
+2025-08-23;5.413;11;0.82;ensolarado
+2025-08-24;3.887;11;0.59;parcialmente nublado
+2025-08-25;5.137;11;0.78;ensolarado
+2025-08-26;2.511;11;0.38;parcialmente nublado
+2025-08-27;4.336;11;0.66;parcialmente nublado
+2025-08-29;2.037;11;0.31;chuvoso
+2025-08-30;4.581;11;0.69;parcialmente nublado
+2025-08-31;5.233;11;0.79;ensolarado
+2025-09-01;5.310;11;0.81;ensolarado
+2025-09-02;5.744;11;0.87;ensolarado
+2025-09-03;5.377;11;0.82;ensolarado
+2025-09-04;5.485;11;0.83;ensolarado
+2025-09-05;5.466;11;0.83;ensolarado
+2025-09-06;1.257;11;0.19;chuvoso
+2025-09-07;2.187;11;0.33;chuvoso
+2025-09-08;4.462;11;0.68;parcialmente nublado
+2025-09-09;3.729;11;0.57;parcialmente nublado
+2025-09-11;6.319;11;0.96;ensolarado
+2025-09-12;4.823;11;0.73;parcialmente nublado
+2025-09-13;3.091;11;0.47;parcialmente nublado
+2025-09-14;5.547;11;0.84;ensolarado
+2025-09-15;6.154;11;0.93;ensolarado
+2025-09-16;3.021;11;0.46;parcialmente nublado
+2025-09-17;4.681;11;0.71;parcialmente nublado
+2025-09-18;5.499;11;0.83;ensolarado
+2025-09-19;5.447;11;0.83;ensolarado
+2025-09-20;6.145;11;0.93;ensolarado
+2025-09-21;5.504;12;0.83;ensolarado
+2025-09-22;1.155;11;0.18;chuvoso
+2025-09-23;2.524;11;0.38;parcialmente nublado
+2025-09-24;1.166;11;0.18;chuvoso
+2025-09-25;1.588;12;0.24;chuvoso
+2025-09-26;4.211;12;0.64;parcialmente nublado
+2025-09-27;7.011;12;1.06;ensolarado
+2025-09-28;5.709;12;0.87;ensolarado
+2025-09-29;6.828;12;1.04;ensolarado
+2025-09-30;6.961;12;1.06;ensolarado
+2025-10-01;4.773;12;0.72;parcialmente nublado
+2025-10-02;1.791;12;0.27;chuvoso
+2025-10-03;4.841;12;0.73;parcialmente nublado
+2025-10-04;1.606;11;0.24;chuvoso
+2025-10-05;6.775;12;1.03;ensolarado
+2025-10-06;6.373;12;0.97;ensolarado
+2025-10-07;1.357;12;0.21;chuvoso
+2025-10-08;1.432;12;0.22;chuvoso
+2025-10-09;1.825;12;0.28;chuvoso
+2025-10-10;1.226;12;0.19;chuvoso
+2025-10-11;4.298;12;0.65;parcialmente nublado
+2025-10-12;5.043;12;0.77;ensolarado
+2025-10-13;3.725;12;0.57;parcialmente nublado
+2025-10-14;5.235;12;0.79;ensolarado
+2025-10-15;5.336;12;0.81;ensolarado
+2025-10-16;6.762;12;1.03;ensolarado
+2025-10-17;6.821;12;1.03;ensolarado
+2025-10-18;1.770;12;0.27;chuvoso
+2025-10-19;3.350;12;0.51;parcialmente nublado
+2025-10-20;5.328;12;0.81;ensolarado
+2025-10-21;6.419;12;0.97;ensolarado
+2025-10-22;7.905;12;1.20;ensolarado
+2025-10-23;8.091;12;1.23;ensolarado
+2025-10-24;7.999;12;1.21;ensolarado
+2025-10-25;7.263;12;1.10;ensolarado
+2025-10-26;6.354;12;0.96;ensolarado
+2025-10-27;1.383;12;0.21;chuvoso
+2025-10-28;0.657;12;0.10;chuvoso
+2025-10-29;4.053;12;0.61;parcialmente nublado
+2025-10-30;1.817;12;0.28;chuvoso
+2025-10-31;2.069;12;0.31;chuvoso
+2025-11-01;6.154;12;0.93;ensolarado
+2025-11-02;1.505;12;0.23;chuvoso
+2025-11-03;4.925;12;0.75;parcialmente nublado
+2025-11-04;4.741;12;0.72;parcialmente nublado
+2025-11-05;4.951;12;0.75;ensolarado
+2025-11-06;2.603;12;0.39;parcialmente nublado
+2025-11-07;6.434;12;0.98;ensolarado
+2025-11-08;3.541;12;0.54;parcialmente nublado
+2025-11-09;3.796;12;0.58;parcialmente nublado
+2025-11-10;7.646;12;1.16;ensolarado
+2025-11-11;8.236;12;1.25;ensolarado
+2025-11-12;7.833;12;1.19;ensolarado
+2025-11-13;3.516;12;0.53;parcialmente nublado
+2025-11-14;4.130;12;0.63;parcialmente nublado
+2025-11-15;2.905;12;0.44;parcialmente nublado
+2025-11-16;3.345;12;0.51;parcialmente nublado
+2025-11-17;3.410;12;0.52;parcialmente nublado
+2025-11-18;3.283;12;0.50;parcialmente nublado
+2025-11-19;5.911;12;0.90;ensolarado
+2025-11-20;5.543;12;0.84;ensolarado
+2025-11-21;7.456;12;1.13;ensolarado
+2025-11-22;5.033;12;0.76;ensolarado
+2025-11-23;4.727;12;0.72;parcialmente nublado
+2025-11-24;2.385;12;0.36;parcialmente nublado
+2025-11-25;5.084;12;0.77;ensolarado
+2025-11-26;8.453;12;1.28;ensolarado
+2025-11-28;7.294;12;1.11;ensolarado
+2025-11-29;8.125;12;1.23;ensolarado
+2025-11-30;7.888;12;1.20;ensolarado
+2025-12-01;5.996;12;0.91;ensolarado
+2025-12-03;6.143;12;0.93;ensolarado
+2025-12-04;4.550;12;0.69;parcialmente nublado
+2025-12-05;7.493;12;1.14;ensolarado
+2025-12-06;6.793;12;1.03;ensolarado
+2025-12-07;6.678;12;1.01;ensolarado
+2025-12-08;4.045;12;0.61;parcialmente nublado
+2025-12-09;1.729;12;0.26;chuvoso
+2025-12-10;7.692;12;1.17;ensolarado
+2025-12-12;4.631;12;0.70;parcialmente nublado
+2025-12-13;3.670;12;0.56;parcialmente nublado
+2025-12-14;3.586;12;0.54;parcialmente nublado
+2025-12-15;6.488;12;0.98;ensolarado
+2025-12-16;5.509;12;0.84;ensolarado
+2025-12-17;1.739;12;0.26;chuvoso
+2025-12-18;2.949;12;0.45;parcialmente nublado
+2025-12-19;2.227;12;0.34;chuvoso
+2025-12-20;6.548;12;0.99;ensolarado
+2025-12-21;7.216;12;1.09;ensolarado
+2025-12-22;7.243;11;1.10;ensolarado
+2025-12-23;7.318;11;1.11;ensolarado
+2025-12-24;6.545;12;0.99;ensolarado
+2025-12-25;6.937;12;1.05;ensolarado
+2025-12-26;7.948;12;1.21;ensolarado
+2025-12-27;6.887;12;1.04;ensolarado
+2025-12-28;7.582;12;1.15;ensolarado
+2025-12-29;6.614;12;1.00;ensolarado
+2025-12-30;6.986;12;1.06;ensolarado
+2025-12-31;6.071;12;0.92;ensolarado
+2026-01-01;5.615;12;0.85;ensolarado
+2026-01-02;4.272;12;0.65;parcialmente nublado
+2026-01-03;5.500;12;0.83;ensolarado
+2026-01-04;4.076;12;0.62;parcialmente nublado
+2026-01-05;2.560;12;0.39;parcialmente nublado
+2026-01-06;5.929;12;0.90;ensolarado
+2026-01-07;5.603;12;0.85;ensolarado
+2026-01-08;6.626;12;1.01;ensolarado
+2026-01-09;5.935;12;0.90;ensolarado
+2026-01-10;7.808;12;1.18;ensolarado
+2026-01-11;7.614;12;1.16;ensolarado
+2026-01-12;7.213;12;1.09;ensolarado
+2026-01-13;4.611;12;0.70;parcialmente nublado
+2026-01-14;6.277;12;0.95;ensolarado
+2026-01-15;4.720;12;0.72;parcialmente nublado
+2026-01-16;4.987;12;0.76;ensolarado
+2026-01-17;5.262;12;0.80;ensolarado
+2026-01-18;5.595;12;0.85;ensolarado
+2026-01-19;2.859;12;0.43;parcialmente nublado
+2026-01-20;4.298;12;0.65;parcialmente nublado
+2026-01-21;2.002;12;0.30;chuvoso
+2026-01-22;2.165;12;0.33;chuvoso
+2026-01-23;3.888;12;0.59;parcialmente nublado
+2026-01-24;2.708;12;0.41;parcialmente nublado
+2026-01-25;4.665;12;0.71;parcialmente nublado
+2026-01-26;6.251;12;0.95;ensolarado
+2026-01-27;5.420;12;0.82;ensolarado
+2026-01-28;5.066;12;0.77;ensolarado
+2026-01-29;6.244;12;0.95;ensolarado
+2026-01-30;3.874;12;0.59;parcialmente nublado
+2026-01-31;4.607;12;0.70;parcialmente nublado
+2026-02-01;3.848;12;0.58;parcialmente nublado
+2026-02-02;3.213;12;0.49;parcialmente nublado
+2026-02-03;3.839;12;0.58;parcialmente nublado
+2026-02-04;4.091;12;0.62;parcialmente nublado
+2026-02-05;4.361;12;0.66;parcialmente nublado
+2026-02-06;5.542;12;0.84;ensolarado
+2026-02-07;3.656;12;0.55;parcialmente nublado
+2026-02-08;4.144;12;0.63;parcialmente nublado
+2026-02-09;2.581;11;0.39;parcialmente nublado
+2026-02-10;2.997;11;0.45;parcialmente nublado
+2026-02-11;4.974;11;0.75;ensolarado
+2026-02-13;7.681;11;1.17;ensolarado
+2026-02-14;3.845;12;0.58;parcialmente nublado
+2026-02-15;7.706;11;1.17;ensolarado
+2026-02-16;6.397;11;0.97;ensolarado
+2026-02-17;4.470;11;0.68;parcialmente nublado
+2026-02-18;6.532;11;0.99;ensolarado
+2026-02-19;5.221;11;0.79;ensolarado
+2026-02-20;6.159;11;0.93;ensolarado
+2026-02-21;5.237;11;0.79;ensolarado
+2026-02-22;4.342;11;0.66;parcialmente nublado
+2026-02-23;3.312;11;0.50;parcialmente nublado
+2026-02-24;3.810;11;0.58;parcialmente nublado
+2026-02-25;2.859;11;0.43;parcialmente nublado
+2026-02-26;2.279;11;0.35;chuvoso
+2026-02-27;2.765;11;0.42;parcialmente nublado
+2026-02-28;6.415;11;0.97;ensolarado
+2026-03-01;5.200;11;0.79;ensolarado
+2026-03-02;4.239;11;0.64;parcialmente nublado
+2026-03-03;4.172;11;0.63;parcialmente nublado
+2026-03-04;6.312;11;0.96;ensolarado
+2026-03-05;5.311;11;0.81;ensolarado
+2026-03-06;2.827;11;0.43;parcialmente nublado
+2026-03-07;3.424;11;0.52;parcialmente nublado
+2026-03-08;4.910;11;0.74;parcialmente nublado
+2026-03-09;1.103;12;0.17;chuvoso
+2026-03-10;1.609;11;0.24;chuvoso
+2026-03-11;1.564;11;0.24;chuvoso
+2026-03-12;1.667;11;0.25;chuvoso
+2026-03-13;2.603;11;0.39;parcialmente nublado
+2026-03-14;6.831;11;1.04;ensolarado
+2026-03-15;5.636;11;0.85;ensolarado
+2026-03-16;6.960;11;1.06;ensolarado
+2026-03-17;5.253;11;0.80;ensolarado
+2026-03-18;4.015;11;0.61;parcialmente nublado
+2026-03-19;2.814;11;0.43;parcialmente nublado
+2026-03-20;4.372;11;0.66;parcialmente nublado
+2026-03-21;5.918;11;0.90;ensolarado
+2026-03-22;5.145;11;0.78;ensolarado
+2026-03-23;6.648;11;1.01;ensolarado
+2026-03-24;6.568;11;1.00;ensolarado
+2026-03-25;5.646;11;0.86;ensolarado
+2026-03-26;5.259;11;0.80;ensolarado
+2026-03-27;6.534;11;0.99;ensolarado
+2026-03-28;6.546;11;0.99;ensolarado
+2026-03-29;6.475;11;0.98;ensolarado
+2026-03-30;4.821;11;0.73;parcialmente nublado
+2026-03-31;3.018;11;0.46;parcialmente nublado
+2026-04-01;4.744;11;0.72;parcialmente nublado
+2026-04-02;5.043;11;0.76;ensolarado
+2026-04-03;5.326;11;0.81;ensolarado
+2026-04-04;4.786;11;0.73;parcialmente nublado
+2026-04-05;5.044;11;0.77;ensolarado
+2026-04-06;5.310;11;0.81;ensolarado
+2026-04-07;3.461;11;0.53;parcialmente nublado
+2026-04-08;2.999;11;0.45;parcialmente nublado
+2026-04-09;3.579;11;0.54;parcialmente nublado
+2026-04-10;1.503;11;0.23;chuvoso
+2026-04-11;5.755;11;0.87;ensolarado
+2026-04-12;5.872;11;0.89;ensolarado
+2026-04-13;4.743;11;0.72;parcialmente nublado
+2026-04-14;5.501;11;0.83;ensolarado
+2026-04-15;6.029;11;0.91;ensolarado
+2026-04-16;5.143;11;0.78;ensolarado
+2026-04-17;5.592;11;0.85;ensolarado
+2026-04-18;4.377;11;0.66;parcialmente nublado
+2026-04-19;5.818;11;0.88;ensolarado
+2026-04-20;5.853;11;0.89;ensolarado
+2026-04-21;5.759;11;0.87;ensolarado
+2026-04-22;5.042;11;0.76;ensolarado
+2026-04-23;5.052;11;0.77;ensolarado
+2026-04-24;4.249;11;0.64;parcialmente nublado
+2026-04-25;4.975;11;0.75;ensolarado
+2026-04-26;4.939;11;0.75;parcialmente nublado
+2026-04-27;3.014;11;0.46;parcialmente nublado
+2026-04-28;2.969;12;0.45;parcialmente nublado
+2026-04-29;3.059;11;0.46;parcialmente nublado
+2026-04-30;3.872;11;0.59;parcialmente nublado
+2026-05-01;3.625;11;0.55;parcialmente nublado
+2026-05-02;3.799;11;0.58;parcialmente nublado
+2026-05-03;1.414;11;0.21;chuvoso
+2026-05-04;4.189;11;0.64;parcialmente nublado
+2026-05-05;4.253;11;0.65;parcialmente nublado
+2026-05-06;5.101;11;0.77;ensolarado
+2026-05-07;4.932;11;0.75;parcialmente nublado
+2026-05-08;2.742;11;0.42;parcialmente nublado
+2026-05-09;2.870;11;0.44;parcialmente nublado
+2026-05-10;0.582;11;0.09;chuvoso
+2026-05-11;3.754;11;0.57;parcialmente nublado
+2026-05-12;4.868;11;0.74;parcialmente nublado
+2026-05-13;4.501;11;0.68;parcialmente nublado
+2026-05-14;3.973;11;0.60;parcialmente nublado
+2026-05-15;1.161;11;0.18;chuvoso
+2026-05-16;4.041;11;0.61;parcialmente nublado
+2026-05-17;1.189;11;0.18;chuvoso
+2026-05-18;0.980;11;0.15;chuvoso
+2026-05-19;0.743;12;0.11;chuvoso
+2026-05-20;1.545;11;0.23;chuvoso
+2026-05-21;0.842;11;0.13;chuvoso
+2026-05-22;0.871;11;0.13;chuvoso
+2026-05-23;0.595;11;0.09;chuvoso
+2026-05-24;3.252;11;0.49;parcialmente nublado
+2026-05-25;2.236;11;0.34;chuvoso
+2026-05-26;3.899;11;0.59;parcialmente nublado
+2026-05-27;1.826;11;0.28;chuvoso
+2026-05-28;4.373;11;0.66;parcialmente nublado
+2026-05-29;2.895;11;0.44;parcialmente nublado
+2026-05-30;2.784;11;0.42;parcialmente nublado
+2026-05-31;2.431;11;0.37;parcialmente nublado
+2026-06-01;2.429;11;0.37;parcialmente nublado
+2026-06-02;2.901;11;0.44;parcialmente nublado
+2026-06-03;3.516;11;0.53;parcialmente nublado
+2026-06-04;2.836;11;0.43;parcialmente nublado
+2026-06-05;3.836;11;0.58;parcialmente nublado
+2026-06-06;4.428;11;0.67;parcialmente nublado
+2026-06-07;4.391;11;0.67;parcialmente nublado
+2026-06-08;4.313;11;0.65;parcialmente nublado
+2026-06-09;3.624;11;0.55;parcialmente nublado
+2026-06-10;3.495;11;0.53;parcialmente nublado
+2026-06-12;1.231;11;0.19;chuvoso
+2026-06-15;0.666;11;0.10;chuvoso
+2026-06-16;1.722;11;0.26;chuvoso
+2026-06-17;4.253;11;0.65;parcialmente nublado
+2026-06-18;4.201;11;0.64;parcialmente nublado
+2026-06-19;4.276;11;0.65;parcialmente nublado
+2026-06-20;2.204;11;0.33;chuvoso
+2026-06-21;4.359;11;0.66;parcialmente nublado
+2026-06-22;4.360;11;0.66;parcialmente nublado
+2026-06-24;0.372;11;0.06;chuvoso
+2026-06-26;2.485;11;0.38;parcialmente nublado
+2026-06-27;4.034;11;0.61;parcialmente nublado
+2026-06-28;4.030;11;0.61;parcialmente nublado
+2026-06-29;4.139;11;0.63;parcialmente nublado
+2026-06-30;4.103;11;0.62;parcialmente nublado
+2026-07-01;4.229;11;0.64;parcialmente nublado
+2026-07-02;4.265;11;0.65;parcialmente nublado
+2026-07-03;4.099;11;0.62;parcialmente nublado
+2026-07-04;2.523;11;0.38;parcialmente nublado
+2026-07-05;3.417;11;0.52;parcialmente nublado
+2026-07-06;3.674;11;0.56;parcialmente nublado
+2026-07-07;1.773;11;0.27;chuvoso
+2026-07-08;3.980;11;0.60;parcialmente nublado
+2026-07-09;4.020;11;0.61;parcialmente nublado
+2026-07-10;4.349;11;0.66;parcialmente nublado
+2026-07-11;4.225;11;0.64;parcialmente nublado
+2026-07-14;2.473;11;0.38;parcialmente nublado
+2026-07-15;4.570;11;0.69;parcialmente nublado
+2026-07-16;4.587;11;0.70;parcialmente nublado
+2026-07-17;4.656;11;0.71;parcialmente nublado
+2026-07-19;4.707;11;0.71;parcialmente nublado
+2026-07-20;4.669;11;0.71;parcialmente nublado
+2026-07-21;4.635;11;0.70;parcialmente nublado
+2026-07-22;4.173;11;0.63;parcialmente nublado
+2026-07-23;2.788;11;0.42;parcialmente nublado
+2026-07-25;1.912;11;0.29;chuvoso
+2026-07-26;4.761;11;0.72;parcialmente nublado
+2026-07-27;4.672;11;0.71;parcialmente nublado
+2026-07-28;4.796;11;0.73;parcialmente nublado
+2026-07-29;3.381;11;0.51;parcialmente nublado
+2026-07-30;3.466;11;0.53;parcialmente nublado
+2026-07-31;4.238;11;0.64;parcialmente nublado
+2026-08-01;4.984;11;0.76;ensolarado
+2026-08-02;4.869;11;0.74;parcialmente nublado
+2026-08-03;3.546;11;0.54;parcialmente nublado
+2026-08-04;3.405;11;0.52;parcialmente nublado
+2026-08-05;4.504;11;0.68;parcialmente nublado
+2026-08-06;5.182;11;0.79;ensolarado
+2026-08-07;2.365;11;0.36;parcialmente nublado
+2026-08-08;4.329;11;0.66;parcialmente nublado
+2026-08-09;3.947;11;0.60;parcialmente nublado
+2026-08-10;0.965;11;0.15;chuvoso
+2026-08-11;1.542;11;0.23;chuvoso
+2026-08-12;3.600;11;0.55;parcialmente nublado
+2026-08-13;3.891;11;0.59;parcialmente nublado
+2026-08-14;3.082;11;0.47;parcialmente nublado
+2026-08-15;2.921;11;0.44;parcialmente nublado
+2026-08-16;4.871;11;0.74;parcialmente nublado
+2026-08-17;4.970;11;0.75;ensolarado
+2026-08-18;5.554;11;0.84;ensolarado
+2026-08-19;5.645;11;0.86;ensolarado
+2026-08-20;5.742;11;0.87;ensolarado
+2026-08-21;4.491;11;0.68;parcialmente nublado
+2026-08-22;5.125;11;0.78;ensolarado
+2026-08-23;5.627;11;0.85;ensolarado
+2026-08-24;1.156;11;0.18;chuvoso
+2026-08-25;1.486;11;0.23;chuvoso
+2026-08-26;3.185;11;0.48;parcialmente nublado
+2026-08-27;5.485;11;0.83;ensolarado
+2026-08-28;5.544;11;0.84;ensolarado
+2026-08-29;3.325;11;0.50;parcialmente nublado
+2026-08-30;3.040;11;0.46;parcialmente nublado
+2026-08-31;2.953;11;0.45;parcialmente nublado
+2026-09-01;1.074;11;0.16;chuvoso
+2026-09-02;4.458;11;0.68;parcialmente nublado
+2026-09-03;6.093;11;0.92;ensolarado
+2026-09-04;5.907;11;0.90;ensolarado
+2026-09-05;1.637;11;0.25;chuvoso
+2026-09-06;0.845;11;0.13;chuvoso
+2026-09-07;0.916;11;0.14;chuvoso
+2026-09-08;2.095;11;0.32;chuvoso
+2026-09-09;1.580;11;0.24;chuvoso
+2026-09-10;0.892;11;0.14;chuvoso
+2026-09-11;4.543;12;0.69;parcialmente nublado
+2026-09-12;1.147;11;0.17;chuvoso
+2026-09-13;0.752;11;0.11;chuvoso
+2026-09-14;0.677;11;0.10;chuvoso
+2026-09-16;4.509;11;0.68;parcialmente nublado
+2026-09-17;1.285;11;0.19;chuvoso
+2026-09-18;4.733;11;0.72;parcialmente nublado
+2026-09-19;5.326;12;0.81;ensolarado
+2026-09-20;1.296;11;0.20;chuvoso
+2026-09-21;6.328;11;0.96;ensolarado
+2026-09-22;1.400;11;0.21;chuvoso
+2026-09-23;1.708;11;0.26;chuvoso
+2026-09-24;2.913;11;0.44;parcialmente nublado
+2026-09-25;5.473;12;0.83;ensolarado
+2026-09-26;6.338;12;0.96;ensolarado
+2026-09-27;6.714;12;1.02;ensolarado
+2026-09-29;5.814;12;0.88;ensolarado

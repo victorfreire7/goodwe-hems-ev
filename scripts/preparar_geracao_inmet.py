@@ -22,7 +22,9 @@ ENTRADA = RAIZ / "dados" / "brutos" / "inmet"
 SAIDA = RAIZ / "dados" / "processados"
 ESTACAO = "A701"
 UTC_PARA_LOCAL = timedelta(hours=-3)  # UTC-3; o Brasil nao usa horario de verao desde 2019
-HORAS_MINIMAS_POR_DIA = 22
+HORA_SOL_INICIO = 6  # horas do dia (local) em que ha sol; fora delas a radiacao e zero
+HORA_SOL_FIM = 18
+HORAS_SOL_MINIMAS = 11  # de 12 horas de sol, o minimo com medicao para o dia ser valido
 LIMITE_ENSOLARADO = 0.75  # fracao da irradiacao diaria do percentil 90 dos dias validos
 LIMITE_PARCIAL = 0.35
 DIAS_DE_HISTORICO = 7
@@ -110,11 +112,13 @@ def main():
     if pico > 1.5:
         print("ATENCAO: valor acima de 1,5 kW/m2; confira a unidade da coluna de radiacao.")
 
+    # A noite o INMET nao registra radiacao: a hora sem medicao fora do periodo de sol vale zero.
     por_dia = {}
     for momento, valor in horario.items():
-        soma, horas = por_dia.get(momento.date(), (0.0, 0))
-        por_dia[momento.date()] = (soma + valor, horas + 1)
-    validos = {d: v for d, v in por_dia.items() if v[1] >= HORAS_MINIMAS_POR_DIA}
+        if HORA_SOL_INICIO <= momento.hour < HORA_SOL_FIM:
+            soma, horas = por_dia.get(momento.date(), (0.0, 0))
+            por_dia[momento.date()] = (soma + valor, horas + 1)
+    validos = {d: v for d, v in por_dia.items() if v[1] >= HORAS_SOL_MINIMAS}
     if not validos:
         raise SystemExit("Nenhum dia com horas validas suficientes.")
 

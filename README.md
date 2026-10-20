@@ -269,10 +269,14 @@ Tratamento da radiação solar (`scripts/preparar_geracao_inmet.py`):
 2. Converte o horário de UTC para o horário local (UTC-3).
 3. Converte radiação acumulada na hora (kJ/m2) em irradiância média da hora (kW/m2), dividindo por 3600.
 4. Grava `dados/processados/perfil_solar_sp.csv` (colunas `timestamp_local` e `irradiancia_kw_m2`). A geração de cada casa em um passo é a irradiância multiplicada pelo kWp da casa e pelo fator de desempenho de 0,80 (seção 4.3).
-5. Classifica cada dia com pelo menos 22 horas válidas, pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
+5. Classifica cada dia com pelo menos 11 das 12 horas de sol (06:00 a 18:00) com medição, pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
 6. Lista, por classe, os dias mais recentes que têm 7 dias válidos anteriores, que servem de histórico para a previsão.
 
 Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular o perfil médio por passo de 15 minutos (reamostrando, se o intervalo original for outro) para dia útil e para fim de semana e normalizá-lo para o consumo diário de cada casa (15,0 kWh na casa de referência da seção 4.3).
+
+O INMET não registra radiação à noite, então a hora sem medição fora do período de sol vale zero. Uma regra anterior, que exigia 22 horas válidas por dia, descartava todos os dias.
+
+Resultado da execução sobre os dados de 2025-01-01 a 2026-09-30 (8.146 registros horários, pico de 1,110 kW/m2): 609 dias válidos, com referência p90 de 6,59 kWh/m2 por dia; 206 ensolarados, 310 parcialmente nublados e 93 chuvosos.
 
 Limitações dos dados: a radiação é medida em um único ponto da cidade; o consumo vem de domicílios uruguaios, com hábitos e clima diferentes dos brasileiros, e por isso só o formato da curva diária é aproveitado, não os valores absolutos. A origem uruguaia está declarada na seção 11.
 
