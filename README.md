@@ -287,9 +287,16 @@ A cada passo de simulação (15 minutos), o motor aplica estas prioridades:
 3. Direcionar o excedente solar, nesta ordem: carro (até a potência do carregador), bateria (até a potência máxima de carga), marketplace, rede.
 4. Descarregar a bateria para a casa nos horários de tarifa mais alta, mantendo reserva para o objetivo do carro.
 
+Implementação atual (`engine/dispatch.py`):
+
+- O comando de um passo usa a leitura do passo atual como estimativa do passo seguinte (persistência).
+- Sem otimização: o carro carrega na potência máxima assim que conectado, até o SOC alvo; a bateria recebe o excedente solar e cobre o déficit em qualquer horário.
+- Com otimização: o carro carrega na potência máxima quando o tempo até a saída se iguala ao tempo necessário; antes disso, carrega nos passos de menor tarifa até a saída (em empate de preço, nos mais cedo) e, fora deles, com o excedente solar. A bateria recebe o excedente depois do carro e cobre o déficit em qualquer horário.
+- A regra 4 (guardar a bateria para a tarifa alta) foi testada e não foi mantida: no cenário padrão de 7 dias, com exportação a R$ 0,00/kWh, ela aumentou o custo das casas 02 e 03, possivelmente porque a bateria mais cheia pela manhã deixava o excedente solar do dia ser exportado sem receita. Deve ser reavaliada quando o valor da exportação (piso do marketplace) estiver definido.
+
 ### 5.2 Previsão
 
-Modelo simples de geração e consumo por hora do dia. O erro é medido com o erro médio absoluto (MAE, em kW) e informado na seção de resultados.
+Modelo simples de geração e consumo por hora do dia. O erro é medido com o erro médio absoluto (MAE, em kW) e informado na seção de resultados. Na implementação atual, a previsão é por persistência: a leitura do passo atual é a estimativa do passo seguinte (seção 5.1). O método final ainda será definido e comparado com a persistência.
 
 ### 5.3 Tarifas e emissões
 
@@ -449,4 +456,8 @@ python -m unittest discover -s tests -v
 
 Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço de potência, SOC, limites de potência, EV desconectado e compra/venda simultânea. O validador recebe leituras do mesmo intervalo de 15 minutos e o modelo de troca: `ideal_microgrid` inclui a energia interna no balanço; `financial_only` considera apenas o fluxo físico da rede. O sistema adota `financial_only` (seção 6).
 
-Ainda faltam testes integrados com simulador e backend, evolução temporal do SOC e cumprimento do prazo de carga do carro.
+`tests/test_scenario.py` cobre os postos da tarifa, os limites de SOC e de potência da casa simulada e o comparativo: cada leitura de cada passo passa por `validate_reading`, a mesma semente reproduz o mesmo resultado, os dois cenários veem o mesmo clima, o carro atinge o SOC alvo em todas as saídas e o cenário com otimização custa menos que o cenário sem.
+
+O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`). O CO2 só é calculado quando o fator é informado.
+
+Ainda faltam testes integrados com o backend.
