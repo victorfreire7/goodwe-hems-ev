@@ -3,9 +3,10 @@ import unittest
 from datetime import datetime
 
 from engine.tariff import INTERMEDIATE, OFF_PEAK, PEAK, load_tariff, period
-from simulator.config import BATTERY_SOC_MAX, BATTERY_SOC_MIN, DEFAULT_HOUSES
+from simulator.config import BATTERY_SOC_MAX, BATTERY_SOC_MIN, DEFAULT_HOUSES, STEPS_PER_DAY
 from simulator.house import House
 from simulator.scenario import run
+from simulator.solar import PROFILE, irradiance_at
 
 WEATHER = ["ensolarado", "parcialmente nublado", "chuvoso"]
 START = datetime(2026, 1, 5, 7)  # segunda-feira
@@ -57,6 +58,29 @@ class HouseTests(unittest.TestCase):
         reading = self.house(2).step(0, {"ev_charge_power_kw": 7.0, "battery_power_kw": 0.0})
         self.assertFalse(reading["ev"]["connected"])
         self.assertEqual(reading["ev"]["charge_power_kw"], 0.0)
+
+
+class SolarTests(unittest.TestCase):
+    def test_interpolation_between_hours(self):
+        profile = {datetime(2026, 1, 5, 7): 0.4, datetime(2026, 1, 5, 8): 0.8}
+        # o passo das 06:30 tem ponto médio 06:37:30, a 7/8 do caminho entre os pontos das horas 6 e 7
+        self.assertAlmostEqual(irradiance_at(profile, datetime(2026, 1, 5, 6, 30), 15), 0.45)
+        self.assertEqual(irradiance_at(profile, datetime(2026, 1, 5, 3, 0), 15), 0.0)
+
+    @unittest.skipUnless(PROFILE.exists(), "perfil_solar_sp.csv não gerado")
+    def test_real_day_generates_within_inverter_limit(self):
+        house = House(DEFAULT_HOUSES[0], datetime(2026, 9, 27, 7), 1, ["2026-09-27"], 42)
+        idle = {"ev_charge_power_kw": 0.0, "battery_power_kw": 0.0}
+        readings = [house.step(index, idle) for index in range(STEPS_PER_DAY)]
+        self.assertGreater(max(r["pv_power_kw"] for r in readings), 0)
+        self.assertLessEqual(max(r["pv_power_kw"] for r in readings), DEFAULT_HOUSES[0].inverter_kw)
+        self.assertEqual(readings[80]["pv_power_kw"], 0.0)  # 03:00
+
+    @unittest.skipUnless(PROFILE.exists(), "perfil_solar_sp.csv não gerado")
+    def test_scenario_runs_with_real_days(self):
+        metrics = run(days=2, start=datetime(2026, 9, 27, 7), seed=42,
+                      weather=["2026-09-27", "2026-09-23"], optimized=True)
+        self.assertGreater(sum(m.pv_kwh for m in metrics.values()), 0)
 
 
 class ScenarioTests(unittest.TestCase):

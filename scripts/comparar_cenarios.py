@@ -61,7 +61,9 @@ def main():
     parser.add_argument("--inicio", default="2026-01-05", help="AAAA-MM-DD")
     parser.add_argument("--semente", type=int, default=42)
     parser.add_argument("--clima", default=DEFAULT_WEATHER,
-                        help="clima de cada dia, separado por vírgula (repete se faltar)")
+                        help="clima de cada dia, separado por vírgula (repete se faltar): ensolarado, "
+                             "parcialmente nublado, chuvoso (curva sintética) ou uma data AAAA-MM-DD "
+                             "(radiação real do INMET, exige dados/processados/perfil_solar_sp.csv)")
     parser.add_argument("--valor-exportacao", type=float, default=0.0,
                         help="R$ por kWh exportado; premissa, ponto 17 do CONTEXT.md em aberto")
     parser.add_argument("--fator-co2", type=float, default=None,

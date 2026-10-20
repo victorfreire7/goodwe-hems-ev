@@ -276,6 +276,8 @@ Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular 
 
 O INMET não registra radiação à noite, então a hora sem medição fora do período de sol vale zero. Uma regra anterior, que exigia 22 horas válidas por dia, descartava todos os dias.
 
+No simulador (`simulator/solar.py`), o clima de um dia pode ser uma data (`--clima 2026-09-27,2026-09-23`): a geração de cada passo é a irradiância daquele dia, interpolada linearmente entre as horas, multiplicada pelo kWp da casa e por 0,80 e limitada à potência do inversor. A hora H do INMET é a média da hora anterior a H, e por isso o valor é associado ao meio dessa hora. Os nomes `ensolarado`, `parcialmente nublado` e `chuvoso` continuam usando a curva sintética da seção 4.3.
+
 Resultado da execução sobre os dados de 2025-01-01 a 2026-09-30 (8.146 registros horários, pico de 1,110 kW/m2): 609 dias válidos, com referência p90 de 6,59 kWh/m2 por dia; 206 ensolarados, 310 parcialmente nublados e 93 chuvosos.
 
 Limitações dos dados: a radiação é medida em um único ponto da cidade; o consumo vem de domicílios uruguaios, com hábitos e clima diferentes dos brasileiros, e por isso só o formato da curva diária é aproveitado, não os valores absolutos. A origem uruguaia está declarada na seção 11.

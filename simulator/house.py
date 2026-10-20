@@ -8,6 +8,7 @@ from simulator.config import (
     CHARGER_KW, CLOUD_VARIATION, EV_CAPACITY_KWH, LOAD_PROFILE_KW, LOAD_VARIATION,
     PV_PERFORMANCE, STEP_HOURS, STEP_MINUTES, STEPS_PER_DAY, WEATHER_FACTOR,
 )
+from simulator.solar import irradiance_at, load_irradiance
 
 
 def parse_timestamp(text):
@@ -65,11 +66,15 @@ class House:
         }
 
     def _pv_kw(self, index, moment):
+        day = (moment.date() - self.start.date()).days
+        weather = self.weather[day % len(self.weather)]
+        if weather not in WEATHER_FACTOR:  # data AAAA-MM-DD: radiação real do INMET naquele dia
+            real = datetime.combine(datetime.fromisoformat(weather).date(), moment.time())
+            power = self.config.kwp * PV_PERFORMANCE * irradiance_at(load_irradiance(), real, STEP_MINUTES)
+            return min(power, self.config.inverter_kw)
         hour = moment.hour + (moment.minute + STEP_MINUTES / 2) / 60
         if not 6 < hour < 18:
             return 0.0
-        day = (moment.date() - self.start.date()).days
-        weather = self.weather[day % len(self.weather)]
         factor = WEATHER_FACTOR[weather]
         if weather == "parcialmente nublado":
             factor *= self._cloud[index]
