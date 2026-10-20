@@ -107,6 +107,7 @@ goodwe-hems-ev/
     brutos/        arquivos baixados das fontes públicas (aneel/, inmet/); não versionados (.gitignore)
     processados/   perfis e classificação de dias gerados pelos scripts; versionados
   docker-compose.yml
+  .env.example     variáveis de ambiente (copiar para .env e trocar as senhas; o .env não é versionado)
 ```
 
 ### 3.4 Ciclo de execução
