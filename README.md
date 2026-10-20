@@ -322,6 +322,8 @@ O simulador usa esses valores sem tributos (ICMS e PIS/COFINS não são incluíd
 
 Os dois cenários rodam sobre o mesmo dia simulado, com a mesma semente aleatória.
 
+No código atual, o marketplace roda a cada passo apenas no cenário com otimização (`marketplace/settlement.py`). O comparativo mostra, por casa, os kWh vendidos e comprados e o ganho do marketplace em R$, que já está descontado do custo. A opção `--sem-marketplace` desliga o marketplace para isolar o efeito dele.
+
 ## 6. Marketplace de energia entre vizinhos
 
 Casas com excedente solar que o próprio carro e a própria bateria não absorvem vendem essa energia a carros elétricos de outras casas simuladas que precisam carregar.
@@ -336,7 +338,11 @@ Casas com excedente solar que o próprio carro e a própria bateria não absorve
 
 A demonstração começa com 3 casas (seção 4.3) e é ampliada até 10 casas.
 
-A implementação inicial está em `marketplace/matching.py`: preço médio entre o valor de oportunidade da exportação e a tarifa do comprador, prioridade por preço e desempate por casa. Uma casa não pode comprar e vender no mesmo passo. Essa regra de preço é uma proposta; o valor de exportação e a integração com o motor ainda estão pendentes.
+A implementação inicial está em `marketplace/matching.py`: preço médio entre o valor de oportunidade da exportação e a tarifa do comprador, prioridade por preço e desempate por casa. Uma casa não pode comprar e vender no mesmo passo.
+
+Integração com o simulador (`marketplace/settlement.py`): a cada passo, toda casa que exportou publica uma oferta com a energia exportada e piso igual ao valor da exportação; toda casa que importou da rede enquanto carregava o carro publica uma ordem com quantidade igual ao menor valor entre a importação e a energia do carro, e teto igual à tarifa da rede no passo. O vendedor ganha (preço - valor da exportação) por kWh e o comprador economiza (tarifa - preço) por kWh; esses ganhos entram no custo de cada casa.
+
+O ganho do marketplace depende do valor da exportação, que ainda é premissa (R$ 0,00/kWh por padrão, `--valor-exportacao`). Com esse valor, o piso é zero e o preço médio é metade da tarifa, o que infla o ganho em relação a um valor de exportação real.
 
 ## 7. Tecnologias GoodWe e integração
 
@@ -458,6 +464,8 @@ Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço d
 
 `tests/test_scenario.py` cobre os postos da tarifa, os limites de SOC e de potência da casa simulada e o comparativo: cada leitura de cada passo passa por `validate_reading`, a mesma semente reproduz o mesmo resultado, os dois cenários veem o mesmo clima, o carro atinge o SOC alvo em todas as saídas e o cenário com otimização custa menos que o cenário sem.
 
-O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`). O CO2 só é calculado quando o fator é informado.
+Também verifica o marketplace no simulador: o total vendido é igual ao total comprado, o cenário sem otimização não tem negociações, e o marketplace reduz o custo sem alterar a energia importada (modelo `financial_only`).
+
+O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`, `--sem-marketplace`). O CO2 só é calculado quando o fator é informado.
 
 Ainda faltam testes integrados com o backend.

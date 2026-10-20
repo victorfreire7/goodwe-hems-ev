@@ -3,22 +3,27 @@ from engine.dispatch import decide
 from engine.metrics import HouseMetrics
 from engine.tariff import load_tariff, price
 from engine.validation import validate_reading
+from marketplace.settlement import trade_step
 from simulator.config import CHARGER_KW, DEFAULT_HOUSES, STEPS_PER_DAY
 from simulator.house import House, parse_timestamp
 
 IDLE_COMMAND = {"ev_charge_power_kw": 0.0, "battery_power_kw": 0.0}
 
 
-def run(*, days, start, seed, weather, optimized, export_value=0.0, houses=DEFAULT_HOUSES, prices=None):
+def run(*, days, start, seed, weather, optimized, export_value=0.0, market=None,
+        houses=DEFAULT_HOUSES, prices=None):
     """Simula `days` dias a partir de `start` e devolve {house_id: HouseMetrics}.
 
-    Cada leitura passa por `validate_reading`; leitura inválida interrompe a execução."""
+    Cada leitura passa por `validate_reading`; leitura inválida interrompe a execução.
+    O marketplace roda a cada passo; por padrão, só no cenário com otimização."""
+    market = optimized if market is None else market
     prices = prices or load_tariff()
     simulated = [House(config, start, days, weather, seed) for config in houses]
     commands = {house.config.house_id: IDLE_COMMAND for house in simulated}
     metrics = {house.config.house_id: HouseMetrics() for house in simulated}
     last = {}
     for index in range(days * STEPS_PER_DAY):
+        readings = {}
         for house in simulated:
             config = house.config
             reading = house.step(index, commands[config.house_id])
@@ -29,8 +34,14 @@ def run(*, days, start, seed, weather, optimized, export_value=0.0, houses=DEFAU
                 raise RuntimeError(f"{config.house_id} {reading['timestamp']}: {check['errors']}")
             moment = parse_timestamp(reading["timestamp"])
             metrics[config.house_id].record(reading, price(moment, prices), export_value)
+            readings[config.house_id] = reading
             commands[config.house_id] = decide(reading, config.battery_power_kw, prices, optimized)
-            last[config.house_id] = reading
+        if market:
+            grid_price = price(moment, prices)
+            for trade in trade_step(readings, grid_price, export_value):
+                metrics[trade.seller_id].record_trade("seller", trade.quantity_kwh, trade.price_per_kwh, export_value)
+                metrics[trade.buyer_id].record_trade("buyer", trade.quantity_kwh, trade.price_per_kwh, grid_price)
+        last = readings
     for house_id, house_metrics in metrics.items():
         house_metrics.finish(last[house_id])
     return metrics

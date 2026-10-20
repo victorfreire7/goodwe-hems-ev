@@ -87,6 +87,25 @@ class ScenarioTests(unittest.TestCase):
         self.assertLess(sum(m.cost for m in self.optimized.values()),
                         sum(m.cost for m in self.baseline.values()))
 
+    def test_market_sold_equals_bought(self):
+        sold = sum(m.market_sold_kwh for m in self.optimized.values())
+        bought = sum(m.market_bought_kwh for m in self.optimized.values())
+        self.assertGreater(sold, 0)
+        self.assertAlmostEqual(sold, bought)
+
+    def test_baseline_has_no_market(self):
+        for metrics in self.baseline.values():
+            self.assertEqual(metrics.market_sold_kwh, 0.0)
+            self.assertEqual(metrics.market_gain, 0.0)
+
+    def test_market_lowers_cost_without_changing_physics(self):
+        without_market = run(days=3, start=START, seed=42, weather=WEATHER, optimized=True, market=False)
+        for house_id, metrics in self.optimized.items():
+            self.assertAlmostEqual(metrics.import_kwh, without_market[house_id].import_kwh)  # financial_only
+            self.assertAlmostEqual(metrics.cost + metrics.market_gain, without_market[house_id].cost)
+        self.assertLess(sum(m.cost for m in self.optimized.values()),
+                        sum(m.cost for m in without_market.values()))
+
 
 if __name__ == "__main__":
     unittest.main()

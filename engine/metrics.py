@@ -13,6 +13,9 @@ class HouseMetrics:
         self.export_kwh = 0.0
         self.pv_kwh = 0.0
         self.cost = 0.0
+        self.market_sold_kwh = 0.0
+        self.market_bought_kwh = 0.0
+        self.market_gain = 0.0  # R$ que o marketplace tirou do custo da casa
         self.visits = 0  # idas e vindas do carro concluídas (do plug-in até a saída)
         self.visits_on_target = 0
         self._last_ev = None
@@ -30,6 +33,19 @@ class HouseMetrics:
             self._last_ev = ev
         elif self._last_ev is not None:
             self._close_visit()
+
+    def record_trade(self, role, quantity_kwh, trade_price, reference_price):
+        """Acerta uma negociação do marketplace.
+
+        Vendedor ganha (preço - valor da exportação); comprador economiza (tarifa - preço)."""
+        if role == "seller":
+            self.market_sold_kwh += quantity_kwh
+            gain = quantity_kwh * (trade_price - reference_price)
+        else:
+            self.market_bought_kwh += quantity_kwh
+            gain = quantity_kwh * (reference_price - trade_price)
+        self.market_gain += gain
+        self.cost -= gain
 
     def finish(self, last_reading):
         """Fecha a visita em andamento se o carro sai logo após o último passo."""

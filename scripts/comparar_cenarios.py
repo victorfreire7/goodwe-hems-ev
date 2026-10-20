@@ -6,6 +6,7 @@ para fechar o último ciclo de carga noturna do carro.
 
 Uso: python scripts/comparar_cenarios.py [--dias 7] [--inicio 2026-01-05] [--semente 42]
          [--clima "ensolarado,chuvoso"] [--valor-exportacao 0.0] [--fator-co2 KG_POR_KWH]
+         [--sem-marketplace]
 """
 import argparse
 import sys
@@ -24,6 +25,8 @@ def totals(metrics):
         "import_kwh": sum(m.import_kwh for m in metrics.values()),
         "export_kwh": sum(m.export_kwh for m in metrics.values()),
         "cost": sum(m.cost for m in metrics.values()),
+        "market_sold_kwh": sum(m.market_sold_kwh for m in metrics.values()),
+        "market_gain": sum(m.market_gain for m in metrics.values()),
         "visits": sum(m.visits for m in metrics.values()),
         "visits_on_target": sum(m.visits_on_target for m in metrics.values()),
     }
@@ -31,17 +34,21 @@ def totals(metrics):
 
 def print_scenario(title, metrics, co2_factor):
     print(f"\n{title}")
-    header = f"{'casa':<9}{'importado kWh':>14}{'exportado kWh':>14}{'autoconsumo %':>14}{'custo R$':>10}{'carro no alvo':>15}"
+    header = (f"{'casa':<9}{'importado kWh':>14}{'exportado kWh':>14}{'autoconsumo %':>14}"
+              f"{'vendido kWh':>12}{'comprado kWh':>13}{'ganho mkt R$':>13}{'custo R$':>10}{'carro no alvo':>15}")
     print(header + (f"{'CO2 kg':>9}" if co2_factor is not None else ""))
     for house_id, m in metrics.items():
         target = f"{m.visits_on_target}/{m.visits}" if m.visits else "-"
         line = (f"{house_id:<9}{m.import_kwh:>14.1f}{m.export_kwh:>14.1f}"
-                f"{m.self_consumption_percent:>14.1f}{m.cost:>10.2f}{target:>15}")
+                f"{m.self_consumption_percent:>14.1f}{m.market_sold_kwh:>12.1f}{m.market_bought_kwh:>13.1f}"
+                f"{m.market_gain:>13.2f}{m.cost:>10.2f}{target:>15}")
         if co2_factor is not None:
             line += f"{m.import_kwh * co2_factor:>9.2f}"
         print(line)
     t = totals(metrics)
-    line = (f"{'total':<9}{t['import_kwh']:>14.1f}{t['export_kwh']:>14.1f}{'':>14}{t['cost']:>10.2f}"
+    bought = sum(m.market_bought_kwh for m in metrics.values())
+    line = (f"{'total':<9}{t['import_kwh']:>14.1f}{t['export_kwh']:>14.1f}{'':>14}"
+            f"{t['market_sold_kwh']:>12.1f}{bought:>13.1f}{t['market_gain']:>13.2f}{t['cost']:>10.2f}"
             f"{str(t['visits_on_target']) + '/' + str(t['visits']):>15}")
     if co2_factor is not None:
         line += f"{t['import_kwh'] * co2_factor:>9.2f}"
@@ -59,6 +66,8 @@ def main():
                         help="R$ por kWh exportado; premissa, ponto 17 do CONTEXT.md em aberto")
     parser.add_argument("--fator-co2", type=float, default=None,
                         help="kg CO2 por kWh da rede; sem fonte oficial o CO2 não é calculado")
+    parser.add_argument("--sem-marketplace", action="store_true",
+                        help="desliga o marketplace no cenário com otimização")
     args = parser.parse_args()
 
     start = datetime.strptime(args.inicio, "%Y-%m-%d").replace(hour=7)
@@ -66,7 +75,7 @@ def main():
     common = dict(days=args.dias, start=start, seed=args.semente, weather=weather,
                   export_value=args.valor_exportacao)
     baseline = run(optimized=False, **common)
-    optimized = run(optimized=True, **common)
+    optimized = run(optimized=True, market=not args.sem_marketplace, **common)
 
     print(f"{args.dias} dias a partir de {args.inicio} 07:00; semente {args.semente}; "
           f"exportação a R$ {args.valor_exportacao:.2f}/kWh (premissa); clima: {', '.join(weather)}")
