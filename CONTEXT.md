@@ -137,6 +137,35 @@ Prazo: 12 dias corridos, de 2026-10-11 a 2026-10-23. O plano anterior, em semana
 
 Regras de trabalho: nenhum número entra na seção de resultados sem ter sido gerado pelo sistema; nenhum valor de tarifa ou fator de emissão de CO2 é usado sem fonte oficial citada.
 
+### 8.1 Próximos passos do código (2026-10-20)
+
+Situação: simulador, motor, marketplace integrado ao simulador, comparação e radiação real do INMET estão prontos e testados (35 testes). O backend e a API ficam com o Gabriel Cavaloti, que versiona o código na `main` com a própria conta; o Victor testa com as próprias chaves.
+
+Repasse ao Gabriel (DECIDIDO em 2026-10-20):
+
+- Ler README, seções 3.4 a 3.6 (ciclo, modos e endpoints) e 4.1 a 4.2 (formatos de leitura e comando).
+- Começar pelo `POST /readings`, com validação do schema e comando neutro na resposta (carro 0, bateria 0), até o motor estar disponível.
+- Em seguida: gravação em Redis e MySQL, `GET` de estado e histórico, `PUT /houses/:id/ev` e `docker-compose.yml`.
+- Esquema do MySQL e chaves do Redis: proposta do Gabriel (mínimo: leituras, decisões, negociações e comparativo).
+
+O que falta depois da API, em ordem de prioridade (corte de escopo do ponto 19):
+
+| # | Item | Responsável | Situação |
+|---|---|---|---|
+| 1 | Serviço HTTP do motor (`/decide`: leituras de um passo para comandos e negociações), embrulhando `decide`, `trade_step` e `validate_reading` | Victor e Claude | PROPOSTA (aguarda ok do Victor) |
+| 2 | Modo do simulador que envia `POST /readings` e aplica os comandos da resposta | Victor e Claude | PENDENTE |
+| 3 | `scripts/comparar_cenarios.py` gravando um JSON para o `/comparison` | Victor e Claude | PENDENTE |
+| 4 | Dashboard: fluxo de energia, gráficos de geração, consumo e SOC, painel comparativo e negociações. Sugestão: HTML com JavaScript puro e Chart.js servido pelo backend, sem etapa de build. Responsável e framework ainda não definidos (ponto 20) | A definir | PENDENTE |
+| 5 | Previsão (ponto 5): média móvel sobre os dias reais do INMET com MAE, ou ajustar o README para persistência | Victor e Claude | PENDENTE |
+| 6 | ARIA (ponto 8), reaproveitando o projeto da outra sprint | A definir | PENDENTE |
+| 7 | Seção de resultados do README com números reais, diagramas, `.txt`, capturas de tela, vídeo (previsto para 22/10) e `docker-compose.yml` | Grupo | PENDENTE |
+
+Pontos menores: corrigir a classificação de dias de verão em `preparar_geracao_inmet.py` (a soma usa só os rótulos de 06:00 a 18:00 e subestima a irradiação de verão; os números de 609 dias do README precisam ser refeitos depois), valor de exportação (ponto 17), fator de CO2 (ponto 4) e perfil de consumo (ECD-UY, opcional).
+
+Resultado parcial com radiação real (3 dias: 2026-09-27, 2026-09-24 e 2026-09-23; exportação a R$ 0,00/kWh): custo de R$ 132,76 para R$ 113,56 (-14,5%), dos quais R$ 9,92 vêm do marketplace; a economia sem marketplace é de cerca de 7%. Esses números dependem da premissa do piso e não entram nos resultados finais.
+
+Calendário: PROPOSTA de congelar o código na noite de 21/10 (a data de 20/10 da tabela acima já passou), com vídeo em 22/10 e entrega em 23/10.
+
 ## 9. Pontos em aberto
 
 A numeração original dos pontos foi mantida (outros trechos e o histórico a citam). Ordem: gravidade primeiro, depois urgência. Critério de gravidade: o que bloqueia a implementação ou a entrega vem antes do que apenas melhora a qualidade; 60 dos 100 pontos dependem de o sistema funcionar (seção 2). Os pontos concluídos estão no fim. Situação em 2026-10-17: faltam 6 dias para a entrega e o congelamento do código está previsto para 2026-10-20 (seção 8).
@@ -241,4 +270,5 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-20 | Passo 6: marketplace do Gabriel ligado ao simulador por passo (`marketplace/settlement.py`); `HouseMetrics` com kWh vendidos e comprados e ganho do marketplace; comparativo com colunas do marketplace e `--sem-marketplace`; 3 testes novos; README: seções 5.4, 6 e 13. Ganho depende do valor da exportação (premissa R$ 0,00/kWh, ponto 17 em aberto) |
 | 2026-10-20 | `preparar_geracao_inmet.py` corrigido (só horas de sol, mínimo de 11 em 12) e executado pelo Victor sobre os dados reais: 609 dias válidos (206 ensolarados, 310 parcialmente nublados, 93 chuvosos); gerados `perfil_solar_sp.csv` e `dias_sp_classificados.csv` em `dados/processados/` |
 | 2026-10-20 | Radiação real no simulador: `simulator/solar.py`; `--clima` aceita datas AAAA-MM-DD (INMET) além das classes sintéticas; 3 testes novos (2 dependem do `perfil_solar_sp.csv`) |
+| 2026-10-20 | Seção 8.1: próximos passos do código, repasse ao Gabriel (API) e itens restantes por prioridade; resultado parcial com radiação real |
 | 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |
