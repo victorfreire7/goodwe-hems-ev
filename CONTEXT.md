@@ -148,6 +148,8 @@ Repasse ao Gabriel (DECIDIDO em 2026-10-20):
 - Em seguida: gravação em Redis e MySQL, `GET` de estado e histórico, `PUT /houses/:id/ev` e `docker-compose.yml`.
 - Esquema do MySQL e chaves do Redis: proposta do Gabriel (mínimo: leituras, decisões, negociações e comparativo).
 
+Implementado por Gabriel em 2026-10-20: backend TypeScript, rotas do README 3.6, validação, modo neutro, cliente HTTP do motor, Redis, MySQL e Compose. Contratos e execução no README 3.6 e 13; tabelas em `backend/schema.sql`. Testes locais incluem MySQL 8.4.6 e Redis 5 para Windows; execução do Compose com Redis 7 ainda não verificada. Permanecem pendentes o `/decide` real, o envio HTTP pelo simulador e a exportação JSON do comparador, conforme os itens 1 a 3 abaixo.
+
 O que falta depois da API, em ordem de prioridade (corte de escopo do ponto 19):
 
 | # | Item | Responsável | Situação |

@@ -155,6 +155,25 @@ A API usa HTTP com corpo em JSON.
 | GET | `/market/trades` | Dashboard | Negociações realizadas |
 | GET | `/summary/today` | ARIA, dashboard | Resumo do dia simulado em curso: economia em R$, energia importada da rede em kWh e CO2 evitado em kg |
 
+O backend em `backend/` implementa essas rotas e `GET /health`. Use `X-Simulation-Id` para separar execuções (padrão: `default`). Cada lote deve manter as mesmas casas, com avanço de 15 minutos. Reenviar um lote idêntico devolve a resposta salva; mudar um passo já recebido ou pular intervalos retorna 409. Datas exigem fuso. Histórico e negociações aceitam `from`, `to` e `limit` (padrão 1000, máximo 1000), em ordem crescente; o intervalo máximo é 31 dias, com últimas 24 horas como padrão.
+
+`PUT /houses/:id/ev` recebe `{"target_soc_percent":80,"departure_time":"07:00"}` e salva a meta para o próximo passo. Casa sem carro informa capacidade zero, `connected: false`, carga zero e `departure_time: null`. O estado usa Redis com recuperação pelo MySQL. Leituras, decisões e negociações são gravadas na mesma transação; as decisões ficam no JSON de `steps`. As metas ficam em `ev_targets`, o comparativo em `comparisons` e as chaves do Redis seguem `hems:<simulation>:house:<id>:state`.
+
+Contrato preparado para o serviço do motor (ainda pendente com Victor): com `ENGINE_MODE=http`, o backend envia `POST /decide` ao `ENGINE_URL`, com `{readings, ev_targets, export_value_per_kwh, optimized}`. As leituras já incluem as metas salvas. A resposta deve conter `{commands, trades, offers, orders}`; os tipos estão em `backend/src/types.ts`. Os comandos usam o timestamp recebido e controlam o próximo intervalo; negociações pertencem ao intervalo recebido (`financial_only`). Falha ou resposta inválida do motor retorna 502 sem gravar o passo. Em `ENGINE_MODE=neutral`, os comandos têm potências zeradas e não há negociações.
+
+`GET /comparison` importa o JSON definido em `COMPARISON_FILE` e guarda a última versão válida de cada simulação no MySQL. O formato mínimo para a exportação do comparador é:
+
+```json
+{
+  "simulation_id": "default",
+  "period": {"from": "2026-10-20T00:00:00-03:00", "to": "2026-10-21T00:00:00-03:00"},
+  "baseline": {"cost": 20, "import_kwh": 30},
+  "optimized": {"cost": 15, "import_kwh": 20}
+}
+```
+
+Esses números são apenas exemplo do formato. O período tem início inclusivo e fim exclusivo. Sem arquivo válido ou versão salva, a rota retorna 503. O resumo usa o dia da última leitura em São Paulo; economia e CO2 evitado exigem comparativo desse mesmo dia. Sem premissas configuradas, custo líquido e emissões retornam `null`.
+
 ## 4. Simulador
 
 O simulador representa uma ou mais casas. Cada casa tem:
@@ -459,6 +478,37 @@ A preencher com dados gerados pelo sistema implementado:
 - Canal Solar, emissões de CO2 da geração elétrica (MCTI e EPE): https://canalsolar.com.br/emissoes-de-co%e2%82%82-geracao-eletrica-mcti/
 
 ## 13. Testes
+
+### API e bancos
+
+Com Docker Compose v2, copie `.env.example` para `.env`, ajuste as senhas e execute na raiz:
+
+```sh
+docker compose up --build -d
+curl http://localhost:3000/health
+```
+
+São iniciados backend (porta 3000), MySQL 8.4 (3306) e Redis 7 (6379), acessíveis apenas no computador local. As tabelas são criadas na inicialização. O padrão `ENGINE_MODE=neutral` permite testar a API enquanto o serviço HTTP do motor está pendente. Para ativá-lo, configure `ENGINE_MODE=http`, um `ENGINE_URL` acessível pelo container e `EXPORT_VALUE_PER_KWH`; o serviço `engine` ainda não faz parte do Compose.
+
+Para desenvolver com Node.js 22 ou superior, suba os bancos com `docker compose up -d mysql redis`, use `MYSQL_HOST=localhost` e `REDIS_HOST=localhost` no `.env` e execute:
+
+```sh
+cd backend
+npm ci
+npm run dev
+```
+
+Verificação do backend, dentro de `backend/`:
+
+```sh
+npm run build
+npm test
+node --env-file=../.env --import tsx --test test/integration/*.test.ts
+```
+
+O último comando exige os bancos acessíveis nos hosts do `.env`. Cria uma simulação de teste isolada e remove seus registros ao terminar. Foram verificados concorrência, rollback e recuperação após reinício com MySQL 8.4.6 e Redis 5.0.14.1 para Windows. O Compose com Redis 7 ainda precisa ser executado em um ambiente com Docker.
+
+### Simulador, motor e marketplace
 
 Testado com Python 3.12, sem dependências externas para os módulos novos:
 

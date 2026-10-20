@@ -1,0 +1,24 @@
+{
+  "name": "goodwe-hems-api",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node --env-file-if-exists=../.env --import tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "tsx --test test/*.test.ts",
+    "test:integration": "tsx --test test/integration/*.test.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "fastify": "^5.6.0",
+    "mysql2": "^3.15.0",
+    "redis": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
