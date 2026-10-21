@@ -154,13 +154,22 @@ O que falta depois da API, em ordem de prioridade (corte de escopo do ponto 19):
 
 | # | Item | Responsável | Situação |
 |---|---|---|---|
-| 1 | Serviço HTTP do motor (`/decide`: leituras de um passo para comandos e negociações), embrulhando `decide`, `trade_step` e `validate_reading` | Victor e Claude | PROPOSTA (aguarda ok do Victor) |
-| 2 | Modo do simulador que envia `POST /readings` e aplica os comandos da resposta | Victor e Claude | PENDENTE |
-| 3 | `scripts/comparar_cenarios.py` gravando um JSON para o `/comparison` | Victor e Claude | PENDENTE |
+| 1 | Serviço HTTP do motor (`engine/service.py`, `POST /decide`), embrulhando `decide`, `build_book`/`match` e `validate_reading`; imagem `engine/Dockerfile` e serviço `engine` no compose | Victor e Claude | FEITO em 2026-10-21 (testado; contrato verificado com `validation.ts` do backend sobre 192 passos) |
+| 2 | Modo do simulador que envia `POST /readings` e aplica os comandos da resposta (`simulator/client.py`, `scripts/rodar_simulacao.py`) | Victor e Claude | FEITO em 2026-10-21 (testado com o motor em memória; falta rodar contra o backend no Docker) |
+| 3 | `scripts/comparar_cenarios.py --json` gravando o `comparison.json` do `/comparison` | Victor e Claude | FEITO em 2026-10-21 |
 | 4 | Dashboard: fluxo de energia, gráficos de geração, consumo e SOC, painel comparativo e negociações. Sugestão: HTML com JavaScript puro e Chart.js servido pelo backend, sem etapa de build. Responsável e framework ainda não definidos (ponto 20) | A definir | PENDENTE |
 | 5 | Previsão (ponto 5): média móvel sobre os dias reais do INMET com MAE, ou ajustar o README para persistência | Victor e Claude | PENDENTE |
 | 6 | ARIA (ponto 8), reaproveitando o projeto da outra sprint | A definir | PENDENTE |
 | 7 | Seção de resultados do README com números reais, diagramas, `.txt`, capturas de tela, vídeo (previsto para 22/10) e `docker-compose.yml` | Grupo | PENDENTE |
+
+Análise do backend do Gabriel (2026-10-21): código bem estruturado, com idempotência por hash, transação por passo e Redis como cache. Pendências encontradas, registradas no README (seções 3.7 a 3.9):
+
+- PUT /houses/:id/ev não chega ao simulador (campo opcional `ev_target` no comando, com mudança no schema do backend). Afeta o comando da ARIA "deixe o carro pronto às 7h" na demonstração. Responsável: Gabriel (backend) e Victor e Claude (simulador). PENDENTE.
+- Sem CORS: dashboard em outra porta não chama a API. Sugestão: o backend serve o dashboard como arquivos estáticos. PENDENTE (decidir com o dashboard).
+- `savings` e `co2_avoided_kg` do `/summary/today` só aparecem se o comparativo cobrir exatamente o dia local corrente; o comparativo atual cobre todo o período, então ficam `null`. PENDENTE (decidir se gera comparativo diário).
+- A potência máxima da bateria não está na leitura; o motor a lê de `simulator/config.py` pelo `house_id`, então casas além das 3 da demonstração precisam ser acrescentadas lá (ampliar até 10 casas).
+- `docker-compose.yml`: acrescentado o serviço `engine` e `ENGINE_URL` no backend. O simulador não está no compose (roda no host com `scripts/rodar_simulacao.py`).
+- Os testes do backend (`npm test`) não foram executados pelo Claude, só lidos; o Victor deve rodá-los.
 
 Pontos menores: corrigir a classificação de dias de verão em `preparar_geracao_inmet.py` (a soma usa só os rótulos de 06:00 a 18:00 e subestima a irradiação de verão; os números de 609 dias do README precisam ser refeitos depois), valor de exportação (ponto 17), fator de CO2 (ponto 4) e perfil de consumo (ECD-UY, opcional).
 
@@ -273,4 +282,5 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-20 | `preparar_geracao_inmet.py` corrigido (só horas de sol, mínimo de 11 em 12) e executado pelo Victor sobre os dados reais: 609 dias válidos (206 ensolarados, 310 parcialmente nublados, 93 chuvosos); gerados `perfil_solar_sp.csv` e `dias_sp_classificados.csv` em `dados/processados/` |
 | 2026-10-20 | Radiação real no simulador: `simulator/solar.py`; `--clima` aceita datas AAAA-MM-DD (INMET) além das classes sintéticas; 3 testes novos (2 dependem do `perfil_solar_sp.csv`) |
 | 2026-10-20 | Seção 8.1: próximos passos do código, repasse ao Gabriel (API) e itens restantes por prioridade; resultado parcial com radiação real |
+| 2026-10-21 | Análise do backend do Gabriel; serviço do motor (`engine/service.py`, `marketplace/settlement.py` com `build_book`), `simulator/client.py`, `scripts/rodar_simulacao.py`, `--json` no comparativo, `engine/Dockerfile` e serviço `engine` no compose, `tests/test_service.py`; README: seções 3.7 a 3.9 e 13 |
 | 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |

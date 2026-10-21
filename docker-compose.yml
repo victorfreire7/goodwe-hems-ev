@@ -24,6 +24,17 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  engine:
+    build:
+      context: .
+      dockerfile: engine/Dockerfile
+    volumes:
+      - ./dados/processados:/app/dados/processados:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   backend:
     build:
       context: .
@@ -36,6 +47,7 @@ services:
       MYSQL_PORT: 3306
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      ENGINE_URL: http://engine:8000
     ports:
       - "127.0.0.1:${BACKEND_PORT:-3000}:3000"
     volumes:
@@ -44,6 +56,8 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      engine:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]

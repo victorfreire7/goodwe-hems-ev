@@ -98,7 +98,7 @@ goodwe-hems-ev/
   simulator/       simulador de casa, inversor, bateria e carregador
   adapter/         interface única simulado/goodwe-local
   backend/         API Node.js/TypeScript
-  engine/          previsão e motor de decisão
+  engine/          previsão e motor de decisão (serviço HTTP em service.py, imagem em Dockerfile)
   marketplace/     ofertas, ordens e casamento
   dashboard/       interface web
   tests/           testes automatizados (unittest) do marketplace e da validação de leituras
@@ -159,7 +159,7 @@ O backend em `backend/` implementa essas rotas e `GET /health`. Use `X-Simulatio
 
 `PUT /houses/:id/ev` recebe `{"target_soc_percent":80,"departure_time":"07:00"}` e salva a meta para o próximo passo. Casa sem carro informa capacidade zero, `connected: false`, carga zero e `departure_time: null`. O estado usa Redis com recuperação pelo MySQL. Leituras, decisões e negociações são gravadas na mesma transação; as decisões ficam no JSON de `steps`. As metas ficam em `ev_targets`, o comparativo em `comparisons` e as chaves do Redis seguem `hems:<simulation>:house:<id>:state`.
 
-Contrato preparado para o serviço do motor (ainda pendente com Victor): com `ENGINE_MODE=http`, o backend envia `POST /decide` ao `ENGINE_URL`, com `{readings, ev_targets, export_value_per_kwh, optimized}`. As leituras já incluem as metas salvas. A resposta deve conter `{commands, trades, offers, orders}`; os tipos estão em `backend/src/types.ts`. Os comandos usam o timestamp recebido e controlam o próximo intervalo; negociações pertencem ao intervalo recebido (`financial_only`). Falha ou resposta inválida do motor retorna 502 sem gravar o passo. Em `ENGINE_MODE=neutral`, os comandos têm potências zeradas e não há negociações.
+Contrato do serviço do motor (detalhado na seção 3.8): com `ENGINE_MODE=http`, o backend envia `POST /decide` ao `ENGINE_URL`, com `{readings, ev_targets, export_value_per_kwh, optimized}`. As leituras já incluem as metas salvas. A resposta deve conter `{commands, trades, offers, orders}`; os tipos estão em `backend/src/types.ts`. Os comandos usam o timestamp recebido e controlam o próximo intervalo; negociações pertencem ao intervalo recebido (`financial_only`). Falha ou resposta inválida do motor retorna 502 sem gravar o passo. Em `ENGINE_MODE=neutral`, os comandos têm potências zeradas e não há negociações.
 
 `GET /comparison` importa o JSON definido em `COMPARISON_FILE` e guarda a última versão válida de cada simulação no MySQL. O formato mínimo para a exportação do comparador é:
 
@@ -173,6 +173,39 @@ Contrato preparado para o serviço do motor (ainda pendente com Victor): com `EN
 ```
 
 Esses números são apenas exemplo do formato. O período tem início inclusivo e fim exclusivo. Sem arquivo válido ou versão salva, a rota retorna 503. O resumo usa o dia da última leitura em São Paulo; economia e CO2 evitado exigem comparativo desse mesmo dia. Sem premissas configuradas, custo líquido e emissões retornam `null`.
+
+### 3.7 Limitações conhecidas da API
+
+- `PUT /houses/:id/ev` grava a meta e o backend a aplica à leitura enviada ao motor, mas o simulador ainda não adota a nova meta: o carro continua saindo no horário do simulador, e `/houses/:id/state` devolve a meta original. A correção prevista é um campo opcional `ev_target` no comando, aplicado pelo simulador.
+- O comparativo gerado por `scripts/comparar_cenarios.py --json` cobre todo o período simulado, a partir das 07:00. Por isso `savings` e `co2_avoided_kg` de `GET /summary/today` ficam `null`, já que exigem um comparativo de exatamente o dia local corrente.
+- A API não tem CORS. Um dashboard servido em outra porta não consegue chamá-la; o dashboard deve ser servido pelo próprio backend ou o CORS deve ser habilitado.
+
+### 3.8 Contrato entre o backend e o motor
+
+O serviço do motor está em `engine/service.py`. O corpo da requisição de `POST {ENGINE_URL}/decide`:
+
+```json
+{
+  "readings": [ { "house_id": "casa-01", "...": "leitura no formato da seção 4.1, com a meta do PUT /ev já aplicada" } ],
+  "ev_targets": { "casa-01": { "target_soc_percent": 90, "departure_time": "07:30" } },
+  "export_value_per_kwh": 0.0,
+  "optimized": true
+}
+```
+
+A resposta traz `commands` (um por casa, formato da seção 4.2, com `market.sold_kwh` e `market.bought_kwh` iguais à soma das negociações da casa), `trades` (`seller_id`, `buyer_id`, `quantity_kwh`, `price_per_kwh`), `offers` (`house_id`, `quantity_kwh`, `export_value_per_kwh`) e `orders` (`house_id`, `quantity_kwh`, `grid_price_per_kwh`). O backend rejeita qualquer resposta fora desse formato (502).
+
+O motor valida cada leitura com `engine/validation.py` (balanço de potência, SOC e limites). A potência máxima da bateria vem de `simulator/config.py` pelo `house_id`, porque a leitura não a informa; uma casa que não está no `simulator/config.py` recebe 422, e leitura malformada recebe 400. Com `optimized: false`, o motor não monta ofertas nem ordens. O mesmo `optimized` e o valor de exportação vêm das variáveis `SIM_OPTIMIZATION` e `EXPORT_VALUE_PER_KWH` do backend; esta última é obrigatória em `ENGINE_MODE=http` e, enquanto o ponto 17 do CONTEXT.md está em aberto, usa-se `0` como premissa.
+
+### 3.9 Como executar o sistema
+
+1. Copie `.env.example` para `.env`, troque `MYSQL_PASSWORD` e `MYSQL_ROOT_PASSWORD` e defina `ENGINE_MODE=http` e `EXPORT_VALUE_PER_KWH=0`.
+2. Gere o comparativo que o `/comparison` vai ler (use os mesmos parâmetros da simulação): `python scripts/comparar_cenarios.py --dias 3 --inicio 2026-01-05 --json dados/processados/comparison.json --simulacao demo`.
+3. Suba os serviços: `docker compose up --build` (MySQL, Redis, motor e backend).
+4. Rode o simulador contra a API: `python scripts/rodar_simulacao.py --simulacao demo --dias 3 --inicio 2026-01-05`. Use `--segundos-por-passo 1` para o modo acelerado e `--simulacao` com outro nome a cada nova execução.
+5. Consulte a API, por exemplo: `curl -H "X-Simulation-Id: demo" http://127.0.0.1:3000/summary/today`.
+
+Sem Docker, o motor roda com `python -m engine.service` (variáveis `ENGINE_HOST` e `ENGINE_PORT`) e o backend com `npm run dev` em `backend/`. O dashboard ainda não existe.
 
 ## 4. Simulador
 
@@ -524,4 +557,8 @@ Também verifica o marketplace no simulador: o total vendido é igual ao total c
 
 O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`, `--sem-marketplace`). O CO2 só é calculado quando o fator é informado.
 
-Ainda faltam testes integrados com o backend.
+`tests/test_service.py` cobre o serviço do motor: o formato da resposta de `/decide`, a consistência entre `market` dos comandos e as negociações, o cenário sem otimização sem marketplace, as entradas inválidas (400 e 422), o laço fechado do simulador com o motor (mesma energia importada que `simulator.scenario.run`) e as rotas HTTP.
+
+Os testes do backend estão em `backend/test/` (`npm test` em `backend/`; `npm run test:integration` usa MySQL e Redis reais). Além deles, o contrato foi verificado com o código de validação do backend (`validation.ts`) sobre 192 passos reais de 2 dias simulados, todos aceitos, com 68 negociações.
+
+Ainda faltam testes de ponta a ponta com o Docker Compose.

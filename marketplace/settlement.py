@@ -7,7 +7,8 @@ from marketplace.matching import Offer, Order, match
 from simulator.config import STEP_HOURS
 
 
-def trade_step(readings, grid_price, export_value):
+def build_book(readings, grid_price, export_value):
+    """Devolve (ofertas, ordens) do passo. `readings` é {house_id: leitura}."""
     offers, orders = [], []
     for house_id, reading in readings.items():
         grid_kwh = reading["grid_power_kw"] * STEP_HOURS
@@ -17,4 +18,8 @@ def trade_step(readings, grid_price, export_value):
         quantity = min(grid_kwh, reading["ev"]["charge_power_kw"] * STEP_HOURS)
         if quantity > 0:
             orders.append(Order(house_id, quantity, grid_price))
-    return match(offers, orders)
+    return offers, orders
+
+
+def trade_step(readings, grid_price, export_value):
+    return match(*build_book(readings, grid_price, export_value))
