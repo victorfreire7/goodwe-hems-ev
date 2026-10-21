@@ -233,7 +233,7 @@ No ponto 23, marketplace e validador possuem testes unitários; comando no READM
 
 ### 9.3 Médio: qualidade e decisões de apoio
 
-20. PENDENTE, dashboard. Framework ou biblioteca do front-end e do diagrama de fluxo de energia (o README diz apenas "página web"). Quem construir o dashboard precisa dominar a escolha. É a parte visual do vídeo; decidir antes de começar o front-end.
+20. RESOLVIDO em 2026-10-21 (aguarda teste do Victor): dashboard em um único `dashboard/index.html`, JavaScript puro e SVG, sem biblioteca; `dashboard/server.py` entrega a página e repassa `/api/*` ao backend (o backend não tem CORS). Serviço `dashboard` no Compose, porta 8080. Verificado só contra uma API simulada; falta rodar com o backend real e no Docker.
 
 Validação do grupo dos itens do README que estão como PROPOSTA (lista na seção 5, abaixo da tabela de decisões), incluindo os parâmetros numéricos da seção 4.3 definidos pelo Claude. Sem validação, o grupo pode divergir do que foi documentado.
 
@@ -283,4 +283,6 @@ Validação do grupo dos itens do README que estão como PROPOSTA (lista na seç
 | 2026-10-20 | Radiação real no simulador: `simulator/solar.py`; `--clima` aceita datas AAAA-MM-DD (INMET) além das classes sintéticas; 3 testes novos (2 dependem do `perfil_solar_sp.csv`) |
 | 2026-10-20 | Seção 8.1: próximos passos do código, repasse ao Gabriel (API) e itens restantes por prioridade; resultado parcial com radiação real |
 | 2026-10-21 | Análise do backend do Gabriel; serviço do motor (`engine/service.py`, `marketplace/settlement.py` com `build_book`), `simulator/client.py`, `scripts/rodar_simulacao.py`, `--json` no comparativo, `engine/Dockerfile` e serviço `engine` no compose, `tests/test_service.py`; README: seções 3.7 a 3.9 e 13 |
+| 2026-10-21 | Casas 04 a 10 definidas (`EXTRA_HOUSES`, `--casas`, `TenHousesTests`); dashboard (`dashboard/index.html`, `server.py`, `Dockerfile`) e serviço `dashboard` no compose; ponto 20 resolvido; README: seções 3.3, 4.3, 8.1 e 13 |
+| 2026-10-21 | `engine/forecast.py` (persistência e média dos 7 dias), `scripts/avaliar_previsao.py` (MAE sobre dados reais; ainda não executado), `tests/test_forecast.py`; `preparar_geracao_inmet.py` passou a somar todas as horas medidas na irradiação diária (reexecutar e atualizar os 609 dias e as classes no README) |
 | 2026-10-17 | Ponto 19 resolvido (ordem de corte de escopo); ponto 22: nomes de arquivos mantidos em inglês, Gabriel commita com a própria conta, `CONTEXT.md` público; restou só a convenção de branches |

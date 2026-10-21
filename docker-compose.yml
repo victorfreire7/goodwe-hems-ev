@@ -64,5 +64,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    environment:
+      BACKEND_URL: http://backend:3000
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: 8080
+    ports:
+      - "127.0.0.1:${DASHBOARD_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
 volumes:
   mysql-data:

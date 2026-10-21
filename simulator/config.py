@@ -62,3 +62,22 @@ DEFAULT_HOUSES = (
     HouseConfig("casa-02", 4.0, 6.0, 2, CarConfig(9, 17, 40.0, 80.0)),
     HouseConfig("casa-03", 8.0, 8.0, 4, None),
 )
+
+# Casas 04 a 10 da ampliação (README, seção 4.3): os perfis das três primeiras com variações de painel e bateria
+EXTRA_HOUSES = (
+    HouseConfig("casa-04", 5.0, 6.0, 2, CarConfig(19, 7, 25.0, 80.0)),
+    HouseConfig("casa-05", 7.0, 8.0, 4, CarConfig(8, 18, 35.0, 80.0)),
+    HouseConfig("casa-06", 5.0, 6.0, 2, CarConfig(20, 7, 30.0, 90.0)),
+    HouseConfig("casa-07", 10.0, 10.0, 4, None),
+    HouseConfig("casa-08", 4.5, 6.0, 2, CarConfig(17, 6, 20.0, 80.0)),
+    HouseConfig("casa-09", 6.0, 6.0, 4, CarConfig(10, 16, 50.0, 80.0)),
+    HouseConfig("casa-10", 9.0, 10.0, 4, None),
+)
+ALL_HOUSES = DEFAULT_HOUSES + EXTRA_HOUSES
+
+
+def houses_for(count):
+    """As `count` primeiras casas (de 3 a 10)."""
+    if not 3 <= count <= len(ALL_HOUSES):
+        raise ValueError(f"O número de casas deve estar entre 3 e {len(ALL_HOUSES)}.")
+    return ALL_HOUSES[:count]

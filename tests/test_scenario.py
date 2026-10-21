@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 
 from engine.tariff import INTERMEDIATE, OFF_PEAK, PEAK, load_tariff, period
-from simulator.config import BATTERY_SOC_MAX, BATTERY_SOC_MIN, DEFAULT_HOUSES, STEPS_PER_DAY
+from simulator.config import ALL_HOUSES, BATTERY_SOC_MAX, BATTERY_SOC_MIN, DEFAULT_HOUSES, STEPS_PER_DAY, houses_for
 from simulator.house import House
 from simulator.scenario import run
 from simulator.solar import PROFILE, irradiance_at
@@ -81,6 +81,22 @@ class SolarTests(unittest.TestCase):
         metrics = run(days=2, start=datetime(2026, 9, 27, 7), seed=42,
                       weather=["2026-09-27", "2026-09-23"], optimized=True)
         self.assertGreater(sum(m.pv_kwh for m in metrics.values()), 0)
+
+
+class TenHousesTests(unittest.TestCase):
+    def test_ten_houses_run_validate_and_reach_the_car_target(self):
+        metrics = run(days=3, start=START, seed=42, weather=WEATHER, optimized=True, houses=houses_for(10))
+        self.assertEqual(len(metrics), 10)
+        for house in ALL_HOUSES:
+            if house.car is not None:
+                self.assertEqual(metrics[house.house_id].visits_on_target, metrics[house.house_id].visits, house.house_id)
+        self.assertAlmostEqual(sum(m.market_sold_kwh for m in metrics.values()),
+                               sum(m.market_bought_kwh for m in metrics.values()))
+
+    def test_house_count_limits(self):
+        for count in (2, 11):
+            with self.assertRaises(ValueError):
+                houses_for(count)
 
 
 class ScenarioTests(unittest.TestCase):

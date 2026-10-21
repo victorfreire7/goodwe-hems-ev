@@ -100,7 +100,7 @@ goodwe-hems-ev/
   backend/         API Node.js/TypeScript
   engine/          previsão e motor de decisão (serviço HTTP em service.py, imagem em Dockerfile)
   marketplace/     ofertas, ordens e casamento
-  dashboard/       interface web
+  dashboard/       interface web (index.html) e servidor que a entrega e repassa /api/* ao backend (server.py, Dockerfile)
   tests/           testes automatizados (unittest) do marketplace e da validação de leituras
   scripts/         extração e preparo de dados externos (tarifa da ANEEL, radiação do INMET, consumo da ECD-UY)
   dados/
@@ -304,7 +304,21 @@ Casas da demonstração inicial:
 | casa-02 | 4,0 kWp | ET G2 de 6 kW | 6,4 kWh (2 módulos) | Em casa das 09:00 às 17:00; chega com SOC de 40%; meta de 80% às 17:00 |
 | casa-03 | 8,0 kWp | ET G2 de 8 kW | 12,8 kWh (4 módulos) | Sem carro; atua como vendedora de excedente |
 
-Os perfis exercitam os três comportamentos do sistema: a casa-01 planeja a carga noturna com bateria e tarifa por horário; a casa-02, em dias nublados, precisa de mais energia do que o próprio painel produz e compra no marketplace; a casa-03 produz mais do que consome e vende. As casas 04 a 10 serão definidas na ampliação do escopo, repetindo estes perfis com variações de painel e bateria.
+Os perfis exercitam os três comportamentos do sistema: a casa-01 planeja a carga noturna com bateria e tarifa por horário; a casa-02, em dias nublados, precisa de mais energia do que o próprio painel produz e compra no marketplace; a casa-03 produz mais do que consome e vende.
+
+As casas 04 a 10 (`EXTRA_HOUSES` em `simulator/config.py`) repetem esses perfis com variações de painel, bateria e horário do carro. A opção `--casas N` (de 3 a 10) escolhe quantas participam do comparativo e da simulação.
+
+| Casa | Painel | Inversor | Bateria | Carro |
+|---|---|---|---|---|
+| casa-04 | 5,0 kWp | ET G2 de 6 kW | 6,4 kWh (2 módulos) | Em casa das 19:00 às 07:00; chega com SOC de 25%; meta de 80% |
+| casa-05 | 7,0 kWp | ET G2 de 8 kW | 12,8 kWh (4 módulos) | Em casa das 08:00 às 18:00; chega com SOC de 35%; meta de 80% |
+| casa-06 | 5,0 kWp | ET G2 de 6 kW | 6,4 kWh (2 módulos) | Em casa das 20:00 às 07:00; chega com SOC de 30%; meta de 90% |
+| casa-07 | 10,0 kWp | ET G2 de 10 kW | 12,8 kWh (4 módulos) | Sem carro; vendedora de excedente |
+| casa-08 | 4,5 kWp | ET G2 de 6 kW | 6,4 kWh (2 módulos) | Em casa das 17:00 às 06:00; chega com SOC de 20%; meta de 80% |
+| casa-09 | 6,0 kWp | ET G2 de 6 kW | 12,8 kWh (4 módulos) | Em casa das 10:00 às 16:00; chega com SOC de 50%; meta de 80% |
+| casa-10 | 9,0 kWp | ET G2 de 10 kW | 12,8 kWh (4 módulos) | Sem carro; vendedora de excedente |
+
+A saída da casa-06 é às 07:00, e não às 08:00, para que a visita caiba no período simulado, que termina às 07:00 depois do último dia.
 
 ### 4.4 Dados públicos de geração e consumo
 
@@ -321,7 +335,7 @@ Tratamento da radiação solar (`scripts/preparar_geracao_inmet.py`):
 2. Converte o horário de UTC para o horário local (UTC-3).
 3. Converte radiação acumulada na hora (kJ/m2) em irradiância média da hora (kW/m2), dividindo por 3600.
 4. Grava `dados/processados/perfil_solar_sp.csv` (colunas `timestamp_local` e `irradiancia_kw_m2`). A geração de cada casa em um passo é a irradiância multiplicada pelo kWp da casa e pelo fator de desempenho de 0,80 (seção 4.3).
-5. Classifica cada dia com pelo menos 11 das 12 horas de sol (06:00 a 18:00) com medição, pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
+5. Classifica cada dia com pelo menos 11 das 12 horas de sol (06:00 a 18:00) com medição (a irradiação do dia soma todas as horas medidas), pela razão entre sua irradiação diária (kWh/m2) e o percentil 90 dos dias válidos: ensolarado (razão de 0,75 ou mais), parcialmente nublado (de 0,35 a menos de 0,75) e chuvoso (abaixo de 0,35). Resultado em `dados/processados/dias_sp_classificados.csv`, que alimenta os cenários de teste.
 6. Lista, por classe, os dias mais recentes que têm 7 dias válidos anteriores, que servem de histórico para a previsão.
 
 Tratamento do consumo (ECD-UY): o script ainda não existe. O plano é calcular o perfil médio por passo de 15 minutos (reamostrando, se o intervalo original for outro) para dia útil e para fim de semana e normalizá-lo para o consumo diário de cada casa (15,0 kWh na casa de referência da seção 4.3).
@@ -330,7 +344,7 @@ O INMET não registra radiação à noite, então a hora sem medição fora do p
 
 No simulador (`simulator/solar.py`), o clima de um dia pode ser uma data (`--clima 2026-09-27,2026-09-23`): a geração de cada passo é a irradiância daquele dia, interpolada linearmente entre as horas, multiplicada pelo kWp da casa e por 0,80 e limitada à potência do inversor. A hora H do INMET é a média da hora anterior a H, e por isso o valor é associado ao meio dessa hora. Os nomes `ensolarado`, `parcialmente nublado` e `chuvoso` continuam usando a curva sintética da seção 4.3.
 
-Resultado da execução sobre os dados de 2025-01-01 a 2026-09-30 (8.146 registros horários, pico de 1,110 kW/m2): 609 dias válidos, com referência p90 de 6,59 kWh/m2 por dia; 206 ensolarados, 310 parcialmente nublados e 93 chuvosos.
+Resultado da execução sobre os dados de 2025-01-01 a 2026-09-30 (8.146 registros horários, pico de 1,110 kW/m2): 609 dias válidos, com referência p90 de 6,59 kWh/m2 por dia; 206 ensolarados, 310 parcialmente nublados e 93 chuvosos. Esses números foram obtidos somando só as horas de sol (06:00 a 18:00). O script agora soma todas as horas medidas do dia (a validade continua pelas horas de sol), para não subestimar dias de verão com sol antes das 06:00 ou depois das 18:00; a contagem e a referência p90 precisam ser atualizadas depois de executar o script de novo.
 
 Limitações dos dados: a radiação é medida em um único ponto da cidade; o consumo vem de domicílios uruguaios, com hábitos e clima diferentes dos brasileiros, e por isso só o formato da curva diária é aproveitado, não os valores absolutos. A origem uruguaia está declarada na seção 11.
 
@@ -355,6 +369,8 @@ Implementação atual (`engine/dispatch.py`):
 ### 5.2 Previsão
 
 Modelo simples de geração e consumo por hora do dia. O erro é medido com o erro médio absoluto (MAE, em kW) e informado na seção de resultados. Na implementação atual, a previsão é por persistência: a leitura do passo atual é a estimativa do passo seguinte (seção 5.1). O método final ainda será definido e comparado com a persistência.
+
+`scripts/avaliar_previsao.py` mede o MAE de duas previsões de geração (`engine/forecast.py`) sobre a radiação real do INMET, hora a hora, de 06:00 a 17:00: a persistência (valor da hora anterior) e a média da mesma hora nos 7 dias anteriores. Só entram as horas em que as duas previsões existem, e o erro sai em kW/m2 e em kW de uma casa de 6 kWp (fator 0,80). O motor continua usando a persistência; trocar o método só depois de o script mostrar ganho. O MAE ainda não foi medido: o valor entra na seção 10 depois que o Victor executar o script. A previsão de consumo não é avaliada, porque o perfil de consumo (ECD-UY) ainda não foi processado.
 
 ### 5.3 Tarifas e emissões
 
@@ -431,11 +447,24 @@ O adaptador expõe uma interface única, com duas implementações previstas: `s
 
 ### 8.1 Dashboard
 
-- Diagrama do fluxo de energia em tempo real entre painel, bateria, carro, casa e rede.
-- Gráfico de geração e consumo do dia.
-- Gráficos do SOC da bateria e do carro.
-- Painel comparativo sem e com otimização: custo, kWh importados da rede, autoconsumo e CO2.
-- Lista das negociações do marketplace.
+Implementado em `dashboard/index.html` (um arquivo, JavaScript puro e SVG, sem dependências externas; tema claro ou escuro conforme o sistema) e `dashboard/server.py` (biblioteca padrão do Python). A página consulta o backend a cada 2 segundos e mostra:
+
+- Resumo do dia (`GET /summary/today`): energia importada e exportada, custo líquido, ganho do marketplace, emissões e economia. Campos que o backend devolve nulos aparecem como "n/d".
+- Diagrama do fluxo de energia entre painel, bateria, carro, casa e rede, com a potência de cada ligação, para a casa selecionada.
+- Decisão do motor para a casa (`GET /houses/:id/decision`), com o texto de `reason`.
+- Gráfico de geração, consumo e rede, e gráfico do SOC da bateria e do carro (`GET /houses/:id/history`).
+- Tabela com todas as casas no último passo; clicar em uma linha seleciona a casa.
+- Comparativo sem e com otimização (`GET /comparison`); se o arquivo ainda não existe, a página avisa em vez de falhar.
+- Negociações, ofertas e ordens do marketplace.
+- Formulário da meta do carro (`PUT /houses/:id/ev`).
+
+O campo "Simulação" do cabeçalho define o cabeçalho `X-Simulation-Id`. Como o backend não tem rota que liste as casas, a página procura `casa-01`, `casa-02`... até a primeira que responde 404.
+
+O backend não habilita CORS (seção 3.7). Por isso o navegador não fala com ele diretamente: `dashboard/server.py` entrega a página e repassa `/api/*` ao backend, repassando `Content-Type` e `X-Simulation-Id`; se o backend estiver fora do ar, responde 502. Variáveis: `BACKEND_URL` (padrão `http://127.0.0.1:3000`), `DASHBOARD_HOST` (`127.0.0.1`) e `DASHBOARD_PORT` (`8080`).
+
+Execução sem Docker, com o backend já no ar: `python dashboard/server.py` e abrir `http://127.0.0.1:8080`. Com Docker: o serviço `dashboard` do Compose sobe junto (`docker compose up --build`) e fica em `http://localhost:8080`.
+
+Verificação feita: a página foi aberta em navegador automatizado (largura de computador e de celular, tema claro e escuro) contra uma API simulada que usa o simulador e o motor reais, sem erros de script e sem rolagem horizontal. Não foi testada contra o backend real nem dentro do Docker.
 
 ### 8.2 Assistente ARIA
 
@@ -521,7 +550,7 @@ docker compose up --build -d
 curl http://localhost:3000/health
 ```
 
-São iniciados backend (porta 3000), MySQL 8.4 (3306) e Redis 7 (6379), acessíveis apenas no computador local. As tabelas são criadas na inicialização. O padrão `ENGINE_MODE=neutral` permite testar a API enquanto o serviço HTTP do motor está pendente. Para ativá-lo, configure `ENGINE_MODE=http`, um `ENGINE_URL` acessível pelo container e `EXPORT_VALUE_PER_KWH`; o serviço `engine` ainda não faz parte do Compose.
+São iniciados backend (porta 3000), MySQL 8.4 (3306) e Redis 7 (6379), acessíveis apenas no computador local. As tabelas são criadas na inicialização. O padrão `ENGINE_MODE=neutral` permite testar a API enquanto o serviço HTTP do motor está pendente. Para ativá-lo, configure `ENGINE_MODE=http`, um `ENGINE_URL` acessível pelo container e `EXPORT_VALUE_PER_KWH`; o serviço `engine` já faz parte do Compose, e o backend usa `ENGINE_URL: http://engine:8000`. O dashboard sobe junto, em `http://localhost:8080`.
 
 Para desenvolver com Node.js 22 ou superior, suba os bancos com `docker compose up -d mysql redis`, use `MYSQL_HOST=localhost` e `REDIS_HOST=localhost` no `.env` e execute:
 
@@ -553,9 +582,13 @@ Os testes cobrem o marketplace e `engine/validation.py`, que verifica balanço d
 
 `tests/test_scenario.py` cobre os postos da tarifa, os limites de SOC e de potência da casa simulada e o comparativo: cada leitura de cada passo passa por `validate_reading`, a mesma semente reproduz o mesmo resultado, os dois cenários veem o mesmo clima, o carro atinge o SOC alvo em todas as saídas e o cenário com otimização custa menos que o cenário sem.
 
+`TenHousesTests` roda 10 casas por 3 dias: todas as leituras passam pela validação, todo carro atinge o SOC alvo em todas as visitas e o total vendido no marketplace é igual ao total comprado; também verifica que `houses_for` recusa menos de 3 ou mais de 10 casas.
+
 Também verifica o marketplace no simulador: o total vendido é igual ao total comprado, o cenário sem otimização não tem negociações, e o marketplace reduz o custo sem alterar a energia importada (modelo `financial_only`).
 
-O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`, `--sem-marketplace`). O CO2 só é calculado quando o fator é informado.
+O comparativo roda em linha de comando, sem backend: `python scripts/comparar_cenarios.py` (opções: `--dias`, `--inicio`, `--semente`, `--clima`, `--valor-exportacao`, `--fator-co2`, `--sem-marketplace`, `--casas`, `--json`, `--simulacao`). O CO2 só é calculado quando o fator é informado.
+
+`tests/test_forecast.py` verifica as duas previsões de geração: a média da mesma hora acerta exatamente um perfil que se repete, exige 7 dias de histórico, e a persistência usa a hora anterior. O MAE sobre dados reais sai de `python scripts/avaliar_previsao.py`.
 
 `tests/test_service.py` cobre o serviço do motor: o formato da resposta de `/decide`, a consistência entre `market` dos comandos e as negociações, o cenário sem otimização sem marketplace, as entradas inválidas (400 e 422), o laço fechado do simulador com o motor (mesma energia importada que `simulator.scenario.run`) e as rotas HTTP.
 

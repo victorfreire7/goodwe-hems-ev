@@ -6,7 +6,7 @@ para fechar o último ciclo de carga noturna do carro.
 
 Uso: python scripts/comparar_cenarios.py [--dias 7] [--inicio 2026-01-05] [--semente 42]
          [--clima "ensolarado,chuvoso"] [--valor-exportacao 0.0] [--fator-co2 KG_POR_KWH]
-         [--sem-marketplace] [--json dados/processados/comparison.json] [--simulacao demo]
+         [--sem-marketplace] [--casas 3] [--json dados/processados/comparison.json] [--simulacao demo]
 """
 import argparse
 import json
@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from simulator.config import houses_for  # noqa: E402
 from simulator.scenario import run  # noqa: E402
 
 DEFAULT_WEATHER = "ensolarado,ensolarado,parcialmente nublado,chuvoso,ensolarado,parcialmente nublado,ensolarado"
@@ -71,6 +72,7 @@ def main():
                         help="kg CO2 por kWh da rede; sem fonte oficial o CO2 não é calculado")
     parser.add_argument("--sem-marketplace", action="store_true",
                         help="desliga o marketplace no cenário com otimização")
+    parser.add_argument("--casas", type=int, default=3, help="número de casas simuladas, de 3 a 10")
     parser.add_argument("--json", metavar="CAMINHO",
                         help="grava o comparativo no formato lido pelo GET /comparison do backend")
     parser.add_argument("--simulacao", default="demo",
@@ -80,7 +82,7 @@ def main():
     start = datetime.strptime(args.inicio, "%Y-%m-%d").replace(hour=7)
     weather = [item.strip() for item in args.clima.split(",")]
     common = dict(days=args.dias, start=start, seed=args.semente, weather=weather,
-                  export_value=args.valor_exportacao)
+                  export_value=args.valor_exportacao, houses=houses_for(args.casas))
     baseline = run(optimized=False, **common)
     optimized = run(optimized=True, market=not args.sem_marketplace, **common)
 

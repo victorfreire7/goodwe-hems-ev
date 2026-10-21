@@ -114,10 +114,11 @@ def main():
 
     # A noite o INMET nao registra radiacao: a hora sem medicao fora do periodo de sol vale zero.
     por_dia = {}
+    # A irradiacao do dia soma todas as horas medidas; a validade conta so as horas de sol com medicao.
     for momento, valor in horario.items():
-        if HORA_SOL_INICIO <= momento.hour < HORA_SOL_FIM:
-            soma, horas = por_dia.get(momento.date(), (0.0, 0))
-            por_dia[momento.date()] = (soma + valor, horas + 1)
+        soma, horas = por_dia.get(momento.date(), (0.0, 0))
+        no_sol = HORA_SOL_INICIO <= momento.hour < HORA_SOL_FIM
+        por_dia[momento.date()] = (soma + valor, horas + (1 if no_sol else 0))
     validos = {d: v for d, v in por_dia.items() if v[1] >= HORAS_SOL_MINIMAS}
     if not validos:
         raise SystemExit("Nenhum dia com horas validas suficientes.")

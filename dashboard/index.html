@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoodWe HEMS-EV</title>
+<style>
+  :root {
+    --bg: #f4f6f8; --card: #ffffff; --text: #1b2430; --muted: #5d6b7b; --line: #dde3ea;
+    --pv: #c98a00; --load: #2f6fdb; --grid: #7b5ea7; --bat: #1d8a62; --ev: #cf4a36; --good: #1d8a62; --bad: #cf4a36;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11161c; --card: #1a222c; --text: #e6ebf0; --muted: #9aa8b8; --line: #2c3745;
+      --pv: #e8b23a; --load: #6a9cf5; --grid: #a98bd6; --bat: #4cc294; --ev: #f07a67; --good: #4cc294; --bad: #f07a67;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 12px 16px;
+           background: var(--card); border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 18px; }
+  header label { color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  input, select, button { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+                          border-radius: 6px; padding: 4px 8px; }
+  button { cursor: pointer; }
+  #status { margin-left: auto; color: var(--muted); }
+  main { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; padding: 12px 16px; max-width: 1400px; margin: 0 auto; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .card h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .s12 { grid-column: span 12; } .s8 { grid-column: span 8; } .s6 { grid-column: span 6; } .s4 { grid-column: span 4; }
+  @media (max-width: 900px) { .s8, .s6, .s4 { grid-column: span 12; } }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .kpi b { display: block; font-size: 20px; } .kpi span { color: var(--muted); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; } th { color: var(--muted); font-weight: 600; }
+  tr.pick { background: color-mix(in srgb, var(--load) 14%, transparent); } tbody tr[data-house] { cursor: pointer; }
+  #market { overflow-x: auto; }
+  svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; color: var(--muted); font-size: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; }
+  .muted { color: var(--muted); } .good { color: var(--good); } .bad { color: var(--bad); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  .bar { height: 8px; border-radius: 4px; margin: 3px 0 8px; }
+  .node { fill: var(--card); stroke: var(--line); stroke-width: 1.5; } .node-t { fill: var(--text); font-size: 13px; font-weight: 600; text-anchor: middle; }
+  .node-s { fill: var(--muted); font-size: 11px; text-anchor: middle; } .edge-t { fill: var(--text); font-size: 12px; text-anchor: middle; paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+  .axis { stroke: var(--line); } .tick { fill: var(--muted); font-size: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>GoodWe HEMS-EV</h1>
+  <label>Simulação <input id="sim" value="demo" size="12"></label>
+  <label>Casa <select id="house"></select></label>
+  <span id="status">conectando...</span>
+</header>
+<main>
+  <section class="card s12"><h2>Resumo do dia (<span id="sumdate">-</span>)</h2><div class="kpis" id="kpis"></div></section>
+  <section class="card s6"><h2>Fluxo de energia <span id="flowtime" class="muted"></span></h2><svg id="flow" viewBox="0 0 520 290"></svg></section>
+  <section class="card s6"><h2>Decisão do motor</h2><div id="decision"></div></section>
+  <section class="card s6"><h2>Geração, consumo e rede (kW)</h2><svg id="chart1" viewBox="0 0 640 210"></svg><div class="legend" id="legend1"></div></section>
+  <section class="card s6"><h2>Estado de carga (%)</h2><svg id="chart2" viewBox="0 0 640 210"></svg><div class="legend" id="legend2"></div></section>
+  <section class="card s8"><h2>Casas no último passo</h2><div style="overflow-x:auto"><table id="houses"></table></div></section>
+  <section class="card s4"><h2>Cenário sem e com otimização</h2><div id="comparison"></div></section>
+  <section class="card s8"><h2>Marketplace: negociações recentes</h2><div id="market"></div></section>
+  <section class="card s4"><h2>Meta do carro</h2><div id="target"></div></section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = value => String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const num = (value, digits = 2) => value == null ? 'n/d' : Number(value).toLocaleString('pt-BR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const ALL_IDS = Array.from({ length: 10 }, (_, i) => `casa-${String(i + 1).padStart(2, '0')}`);
+let busy = false, knownHouses = '', houseIds = null;
+
+async function api(path, options = {}) {
+  const headers = { 'X-Simulation-Id': $('sim').value.trim() || 'default', ...(options.headers || {}) };
+  const response = await fetch('/api' + path, { ...options, headers });
+  return { ok: response.ok, status: response.status, data: await response.json().catch(() => null) };
+}
+
+// Não há rota que liste as casas: procura casa-01, casa-02... até a primeira que não existe.
+async function discover() {
+  const found = [];
+  for (const id of ALL_IDS) {
+    const result = await api(`/houses/${id}/state`);
+    if (result.status === 502) throw new Error('backend indisponível');
+    if (!result.ok) break;
+    found.push(id);
+  }
+  return found.length ? found : null;
+}
+
+function lineChart(svg, legend, series, { min = null, max = null } = {}) {
+  const W = 640, H = 210, L = 38, R = 10, T = 10, B = 24;
+  const points = series.flatMap(item => item.values.filter(v => v != null));
+  if (!points.length) { svg.innerHTML = ''; legend.innerHTML = ''; return; }
+  const lo = min ?? Math.min(0, ...points), hi = max ?? Math.max(...points, lo + 1);
+  const count = Math.max(...series.map(item => item.values.length));
+  const x = i => L + (count < 2 ? 0 : (i / (count - 1)) * (W - L - R));
+  const y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  let out = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + ((hi - lo) * i) / 4;
+    out += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${L - 5}" y="${y(v) + 3}" text-anchor="end">${num(v, hi - lo > 20 ? 0 : 1)}</text>`;
+  }
+  const labels = series[0].labels;
+  for (const i of [0, Math.floor((count - 1) / 2), count - 1]) {
+    if (labels[i]) out += `<text class="tick" x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === count - 1 ? 'end' : 'middle'}">${esc(labels[i])}</text>`;
+  }
+  for (const item of series) {
+    const path = item.values.map((v, i) => v == null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean).join(' ');
+    out += `<polyline fill="none" stroke="${item.color}" stroke-width="1.8" points="${path}"/>`;
+  }
+  svg.innerHTML = out;
+  legend.innerHTML = series.map(item => `<span><i style="background:${item.color}"></i>${esc(item.name)}</span>`).join('');
+}
+
+function flow(reading) {
+  const svg = $('flow');
+  if (!reading) { svg.innerHTML = ''; return; }
+  const nodes = { pv: [80, 50], grid: [440, 50], home: [260, 150], battery: [80, 250], ev: [440, 250] };
+  const pv = reading.pv_power_kw, bat = reading.battery.power_kw, grid = reading.grid_power_kw, ev = reading.ev.charge_power_kw;
+  const edges = [
+    ['pv', 'home', pv, 'var(--pv)'],
+    bat >= 0 ? ['battery', 'home', bat, 'var(--bat)'] : ['home', 'battery', -bat, 'var(--bat)'],
+    grid >= 0 ? ['grid', 'home', grid, 'var(--grid)'] : ['home', 'grid', -grid, 'var(--grid)'],
+    ['home', 'ev', ev, 'var(--ev)'],
+  ];
+  let out = '<defs>' + ['pv', 'bat', 'grid', 'ev'].map((name, i) =>
+    `<marker id="m${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--${name === 'bat' ? 'bat' : name})"/></marker>`).join('') + '</defs>';
+  const marker = { 'var(--pv)': 0, 'var(--bat)': 1, 'var(--grid)': 2, 'var(--ev)': 3 };
+  for (const [from, to, kw, color] of edges) {
+    const [x1, y1] = nodes[from], [x2, y2] = nodes[to], active = kw > 0.005;
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+    out += `<line x1="${x1 + ux * 42}" y1="${y1 + uy * 30}" x2="${x2 - ux * 46}" y2="${y2 - uy * 34}" stroke="${color}" stroke-width="${active ? 2 + Math.min(kw, 7) * 0.8 : 1.5}" stroke-opacity="${active ? 1 : 0.25}" ${active ? `marker-end="url(#m${marker[color]})"` : 'stroke-dasharray="4 4"'}/>`;
+    out += `<text class="edge-t" x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 6}">${num(kw, 2)} kW</text>`;
+  }
+  const box = (key, title, sub) => {
+    const [cx, cy] = nodes[key];
+    return `<rect class="node" x="${cx - 44}" y="${cy - 28}" width="88" height="56" rx="10"/><text class="node-t" x="${cx}" y="${cy - 3}">${title}</text><text class="node-s" x="${cx}" y="${cy + 14}">${sub}</text>`;
+  };
+  out += box('pv', 'Painel', 'solar') + box('grid', 'Rede', grid >= 0 ? 'importando' : 'exportando')
+    + box('home', 'Casa', `carga ${num(reading.load_power_kw, 2)} kW`)
+    + box('battery', 'Bateria', `SOC ${num(reading.battery.soc_percent, 0)}%`)
+    + box('ev', 'Carro', reading.ev.capacity_kwh === 0 ? 'sem carro' : reading.ev.connected ? `SOC ${num(reading.ev.soc_percent, 0)}%` : 'fora de casa');
+  svg.innerHTML = out;
+  $('flowtime').textContent = reading.timestamp.slice(0, 16).replace('T', ' ');
+}
+
+function kpis(summary) {
+  const items = summary ? [
+    ['Importado', num(summary.import_kwh, 1) + ' kWh'], ['Exportado', num(summary.export_kwh, 1) + ' kWh'],
+    ['Custo líquido', summary.cost == null ? 'n/d' : 'R$ ' + num(summary.cost)],
+    ['Ganho do marketplace', summary.market_gain == null ? 'n/d' : 'R$ ' + num(summary.market_gain)],
+    ['Emissões', summary.emissions_kg == null ? 'n/d' : num(summary.emissions_kg) + ' kg CO2'],
+    ['Economia vs. sem otimização', summary.savings == null ? 'n/d' : 'R$ ' + num(summary.savings)],
+  ] : [];
+  $('kpis').innerHTML = items.map(([label, value]) => `<div class="kpi"><b>${esc(value)}</b><span>${esc(label)}</span></div>`).join('')
+    || '<span class="muted">Sem dados.</span>';
+  $('sumdate').textContent = summary ? summary.date : '-';
+}
+
+function comparison(result) {
+  const box = $('comparison');
+  if (!result.ok) { box.innerHTML = '<span class="muted">Comparativo indisponível (rode scripts/comparar_cenarios.py --json).</span>'; return; }
+  const { baseline: a, optimized: b, period } = result.data;
+  const row = (label, x, y, unit) => {
+    const delta = x ? ((y - x) / x) * 100 : 0, top = Math.max(x, y, 1e-9);
+    return `<div>${esc(label)}: <b>${unit}${num(x, 1)}</b> &rarr; <b>${unit}${num(y, 1)}</b>
+      <span class="${delta <= 0 ? 'good' : 'bad'}">(${delta > 0 ? '+' : ''}${num(delta, 1)}%)</span></div>
+      <div class="bar" style="width:${(x / top) * 100}%;background:var(--muted)"></div>
+      <div class="bar" style="width:${(y / top) * 100}%;background:var(--good)"></div>`;
+  };
+  box.innerHTML = row('Custo', a.cost, b.cost, 'R$ ') + row('Energia importada', a.import_kwh, b.import_kwh, '')
+    + `<div class="muted">Período: ${esc(period.from.slice(0, 10))} a ${esc(period.to.slice(0, 10))}. Cinza: sem otimização; verde: com.</div>`;
+}
+
+function housesTable(houses, selected) {
+  $('houses').innerHTML = '<thead><tr><th>Casa</th><th>Painel kW</th><th>Carga kW</th><th>Bateria %</th><th>Carro %</th><th>Rede kW</th></tr></thead><tbody>'
+    + houses.map(h => `<tr data-house="${esc(h.house_id)}" class="${h.house_id === selected ? 'pick' : ''}"><td>${esc(h.house_id)}</td><td>${num(h.pv_power_kw)}</td>
+      <td>${num(h.load_power_kw)}</td><td>${num(h.battery.soc_percent, 0)}</td>
+      <td>${h.ev.capacity_kwh === 0 ? '-' : h.ev.connected ? num(h.ev.soc_percent, 0) : 'fora'}</td><td>${num(h.grid_power_kw)}</td></tr>`).join('') + '</tbody>';
+}
+
+function marketPanel(trades, offers, orders) {
+  const rows = (trades.ok ? trades.data : []).slice(-10).reverse();
+  $('market').innerHTML = `<div class="muted">Ofertas abertas: ${offers.ok ? offers.data.length : 0}; ordens abertas: ${orders.ok ? orders.data.length : 0} (último passo).</div>`
+    + (rows.length ? '<table><thead><tr><th>Horário</th><th>Vendedor</th><th>Comprador</th><th>kWh</th><th>R$/kWh</th></tr></thead><tbody>'
+      + rows.map(t => `<tr><td>${esc(t.timestamp.slice(0, 16).replace('T', ' '))}</td><td>${esc(t.seller_id)}</td><td>${esc(t.buyer_id)}</td><td>${num(t.quantity_kwh, 3)}</td><td>${num(t.price_per_kwh, 3)}</td></tr>`).join('') + '</tbody></table>'
+      : '<div class="muted" style="margin-top:6px">Nenhuma negociação no período.</div>');
+}
+
+function decisionPanel(result) {
+  const d = result.ok ? result.data : null;
+  $('decision').innerHTML = d ? `<p style="margin:0 0 8px"><b>${esc(d.reason)}</b></p>
+    <div class="muted">Carga do carro: ${num(d.ev_charge_power_kw)} kW &middot; Bateria: ${num(d.battery_power_kw)} kW
+    (${d.battery_power_kw > 0 ? 'descarrega' : d.battery_power_kw < 0 ? 'carrega' : 'parada'})<br>
+    Marketplace: vendeu ${num(d.market.sold_kwh, 3)} kWh, comprou ${num(d.market.bought_kwh, 3)} kWh<br>Comando para o passo seguinte a ${esc(d.timestamp.slice(0, 16).replace('T', ' '))}.</div>`
+    : '<span class="muted">Sem decisão.</span>';
+}
+
+function targetForm(reading) {
+  const box = $('target');
+  if (!reading || reading.ev.capacity_kwh === 0) { box.innerHTML = '<span class="muted">Esta casa não tem carro.</span>'; return; }
+  if (box.dataset.house === reading.house_id) return; // não sobrescreve o que a pessoa está digitando
+  box.dataset.house = reading.house_id;
+  box.innerHTML = `<div class="row"><label>SOC alvo % <input id="tsoc" type="number" min="0" max="100" value="${reading.ev.target_soc_percent}" style="width:70px"></label>
+    <label>Saída <input id="ttime" type="time" value="${esc(reading.ev.departure_time)}"></label><button id="tsend">Enviar</button></div><div id="tmsg" class="muted" style="margin-top:6px"></div>`;
+  $('tsend').onclick = async () => {
+    const result = await api(`/houses/${reading.house_id}/ev`, { method: 'PUT', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ target_soc_percent: Number($('tsoc').value), departure_time: $('ttime').value }) });
+    $('tmsg').textContent = result.ok ? 'Meta enviada; vale a partir do próximo passo.' : (result.data?.error || 'Falha ao enviar.');
+  };
+}
+
+async function refresh() {
+  if (busy) return;
+  busy = true;
+  try {
+    houseIds = houseIds || await discover();
+    const states = houseIds ? await Promise.all(houseIds.map(id => api(`/houses/${id}/state`))) : [];
+    if (states.some(result => result.status === 502)) throw new Error('backend indisponível');
+    const houses = states.filter(result => result.ok).map(result => result.data);
+    if (!houses.length) {
+      houseIds = null;
+      $('status').textContent = 'sem leituras nesta simulação';
+      flow(null); kpis(null); housesTable([], ''); return;
+    }
+    const ids = houses.map(h => h.house_id).join(',');
+    if (ids !== knownHouses) {
+      const previous = $('house').value;
+      $('house').innerHTML = houses.map(h => `<option>${esc(h.house_id)}</option>`).join('');
+      if (houses.some(h => h.house_id === previous)) $('house').value = previous;
+      knownHouses = ids;
+    }
+    const id = $('house').value, selected = houses.find(h => h.house_id === id) || houses[0];
+    const [history, decision, trades, offers, orders, summary, compare] = await Promise.all([
+      api(`/houses/${id}/history`), api(`/houses/${id}/decision`), api('/market/trades'),
+      api('/market/offers'), api('/market/orders'), api('/summary/today'), api('/comparison')]);
+    flow(selected); housesTable(houses, id); decisionPanel(decision); marketPanel(trades, offers, orders);
+    kpis(summary.ok ? summary.data : null); comparison(compare); targetForm(selected);
+    const rows = history.ok ? history.data : [];
+    const labels = rows.map(r => r.timestamp.slice(5, 16).replace('T', ' '));
+    lineChart($('chart1'), $('legend1'), [
+      { name: 'Painel', color: 'var(--pv)', values: rows.map(r => r.pv_power_kw), labels },
+      { name: 'Carga da casa', color: 'var(--load)', values: rows.map(r => r.load_power_kw), labels },
+      { name: 'Rede (+ importa, - exporta)', color: 'var(--grid)', values: rows.map(r => r.grid_power_kw), labels }]);
+    lineChart($('chart2'), $('legend2'), [
+      { name: 'Bateria', color: 'var(--bat)', values: rows.map(r => r.battery.soc_percent), labels },
+      { name: 'Carro', color: 'var(--ev)', values: rows.map(r => r.ev.connected ? r.ev.soc_percent : null), labels }], { min: 0, max: 100 });
+    $('status').textContent = 'atualizado ' + new Date().toLocaleTimeString('pt-BR');
+  } catch (error) {
+    $('status').textContent = 'sem conexão com o backend';
+  } finally { busy = false; }
+}
+
+$('houses').addEventListener('click', event => {
+  const row = event.target.closest('tr[data-house]');
+  if (row) { $('house').value = row.dataset.house; refresh(); }
+});
+$('house').onchange = refresh;
+$('sim').onchange = () => { knownHouses = ''; houseIds = null; $('target').dataset.house = ''; refresh(); };
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

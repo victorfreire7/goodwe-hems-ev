@@ -15,10 +15,10 @@ from engine.tariff import load_tariff, price
 from engine.validation import validate_reading
 from marketplace.matching import match
 from marketplace.settlement import build_book
-from simulator.config import CHARGER_KW, DEFAULT_HOUSES
+from simulator.config import ALL_HOUSES, CHARGER_KW
 from simulator.house import parse_timestamp
 
-HOUSES = {config.house_id: config for config in DEFAULT_HOUSES}
+HOUSES = {config.house_id: config for config in ALL_HOUSES}
 
 
 class RequestError(Exception):

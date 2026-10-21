@@ -5,7 +5,7 @@ em ENGINE_MODE=neutral os comandos são zerados. Cada execução usa um --simula
 o backend recusa passos que já recebeu com leituras diferentes (409).
 
 Uso: python scripts/rodar_simulacao.py [--url http://127.0.0.1:3000] [--simulacao demo] [--dias 1]
-         [--inicio 2026-01-05] [--semente 42] [--clima "ensolarado,chuvoso"] [--segundos-por-passo 0]
+         [--inicio 2026-01-05] [--semente 42] [--clima "ensolarado,chuvoso"] [--casas 3] [--segundos-por-passo 0]
 """
 import argparse
 import sys
@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from simulator.client import http_sender, simulate  # noqa: E402
-from simulator.config import STEPS_PER_DAY  # noqa: E402
+from simulator.config import STEPS_PER_DAY, houses_for  # noqa: E402
 
 DEFAULT_WEATHER = "ensolarado,ensolarado,parcialmente nublado,chuvoso,ensolarado,parcialmente nublado,ensolarado"
 
@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--semente", type=int, default=42)
     parser.add_argument("--clima", default=DEFAULT_WEATHER,
                         help="clima de cada dia: ensolarado, parcialmente nublado, chuvoso ou uma data AAAA-MM-DD")
+    parser.add_argument("--casas", type=int, default=3, help="número de casas simuladas, de 3 a 10")
     parser.add_argument("--segundos-por-passo", type=float, default=0.0,
                         help="0 = modo lote; 1 = modo acelerado (96 s por dia simulado)")
     args = parser.parse_args()
@@ -42,7 +43,7 @@ def main():
 
     print(f"Simulação '{args.simulacao}' em {args.url}: {args.dias} dia(s) a partir de {args.inicio} 07:00")
     simulate(http_sender(args.url, args.simulacao), days=args.dias, start=start, seed=args.semente,
-             weather=weather, seconds_per_step=args.segundos_por_passo, on_step=progress)
+             weather=weather, houses=houses_for(args.casas), seconds_per_step=args.segundos_por_passo, on_step=progress)
 
 
 if __name__ == "__main__":
