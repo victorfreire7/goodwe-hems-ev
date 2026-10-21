@@ -6,11 +6,12 @@ para fechar o último ciclo de carga noturna do carro.
 
 Uso: python scripts/comparar_cenarios.py [--dias 7] [--inicio 2026-01-05] [--semente 42]
          [--clima "ensolarado,chuvoso"] [--valor-exportacao 0.0] [--fator-co2 KG_POR_KWH]
-         [--sem-marketplace]
+         [--sem-marketplace] [--json dados/processados/comparison.json] [--simulacao demo]
 """
 import argparse
+import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -70,6 +71,10 @@ def main():
                         help="kg CO2 por kWh da rede; sem fonte oficial o CO2 não é calculado")
     parser.add_argument("--sem-marketplace", action="store_true",
                         help="desliga o marketplace no cenário com otimização")
+    parser.add_argument("--json", metavar="CAMINHO",
+                        help="grava o comparativo no formato lido pelo GET /comparison do backend")
+    parser.add_argument("--simulacao", default="demo",
+                        help="simulation_id gravado no JSON; deve ser o X-Simulation-Id usado nas consultas")
     args = parser.parse_args()
 
     start = datetime.strptime(args.inicio, "%Y-%m-%d").replace(hour=7)
@@ -90,6 +95,18 @@ def main():
           f"({(b['cost'] - a['cost']) / a['cost'] * 100:+.1f}%)")
     print(f"  energia importada: {a['import_kwh']:.1f} -> {b['import_kwh']:.1f} kWh "
           f"({(b['import_kwh'] - a['import_kwh']) / a['import_kwh'] * 100:+.1f}%)")
+
+    if args.json:
+        stamp = "%Y-%m-%dT%H:%M:%S-03:00"
+        comparison = {
+            "simulation_id": args.simulacao,
+            "period": {"from": f"{start:{stamp}}", "to": f"{start + timedelta(days=args.dias):{stamp}}"},
+            "baseline": {"cost": a["cost"], "import_kwh": a["import_kwh"]},
+            "optimized": {"cost": b["cost"], "import_kwh": b["import_kwh"]},
+        }
+        Path(args.json).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.json).write_text(json.dumps(comparison, indent=2), encoding="utf-8")
+        print(f"\nComparativo gravado em {args.json}")
 
 
 if __name__ == "__main__":
